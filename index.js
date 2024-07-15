@@ -32,6 +32,7 @@ async function yt_call(query, length = 10, pageToken) {
 
         const response = await fetch(url);
         const data = await response.json();
+        console.log(data.items)
 
         if (data.items) {
             data.items.forEach((e) => {
@@ -46,9 +47,11 @@ async function yt_call(query, length = 10, pageToken) {
 
                 const figure = document.createElement("figure");
                 figure.setAttribute("class", "image is-16by9");
+                figure.setAttribute("style", "overflow: hidden;")
 
                 const img = document.createElement("img");
                 img.setAttribute("id", "thumbnail");
+                img.setAttribute("style", "object-fit: cover; object-position: center; width: 100%; height: 100%;")
 
                 const title = document.createElement("div");
                 title.setAttribute("class", "p-2 has-text-white");
@@ -77,7 +80,6 @@ async function yt_call(query, length = 10, pageToken) {
 
         // load more button
         NextpageToken = data.nextPageToken;
-        console.log(NextpageToken)
         if (NextpageToken && !button) {
             button = document.createElement("button");
             button.setAttribute("class", "button is-rounded");
