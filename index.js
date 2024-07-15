@@ -32,7 +32,7 @@ async function yt_call(query, length = 10, pageToken) {
 
         const response = await fetch(url);
         const data = await response.json();
-        console.log(data.items)
+        //console.log(data)
 
         if (data.items) {
             data.items.forEach((e) => {
@@ -76,6 +76,10 @@ async function yt_call(query, length = 10, pageToken) {
             });
         } else {
             console.error(data.error.message);
+            const notify = document.createElement("p")
+            notify.innerHTML = data.error.message
+            container.appendChild(notify)
+            return;
         }
 
         // load more button
