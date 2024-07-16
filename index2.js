@@ -23,7 +23,6 @@ function time_stamp(sec){
     var sDisplay = s > 0 ? (s < 10 ? "0" + s : s) : "";
     return hDisplay + mDisplay + sDisplay;
 }
-console.log(time_stamp(14571))
 
 // Get the query parameter
 const urlParams = new URLSearchParams(window.location.search);
@@ -33,12 +32,13 @@ const query = urlParams.get("q");
 yt_call(query)
 
 async function yt_call(query, pageToken) {
-    let nextPage = "";
-    if (pageToken !== "") nextPage = `&nextpage?q=${encodeURIComponent(pageToken)}`;
+    let url = `${base_url}search?q=${query}&filter=videos`
+
+    if (pageToken !== undefined){
+        url = `${base_url}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(pageToken)}`;
+    }
 
     try {
-        const url = `${base_url}search?q=${query}&filter=videos` + nextPage
-
         const response = await fetch(url);
         const data = await response.json();
         console.log(data)
