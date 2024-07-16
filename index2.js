@@ -1,5 +1,5 @@
-const API_KEY = "YOUR API KEY";
-let NextpageToken = "";
+let NextPageUrl = "";
+const base_url = 'https://pipedapi.kavin.rocks/'
 
 const columns = document.querySelector("#columns");
 const container = document.querySelector("#container");
@@ -12,30 +12,42 @@ function string_limit(str, maxLength = 10) {
     }
     return str;
 }
+function time_stamp(sec){
+    if(sec > 3600){
+        return sec / 3600;
+    }
+    else if(sec > 60){
+        return sec / 60;
+    }
+    else {
+        return sec
+    }
+}
+console.log(time_stamp(14571))
 
 // Get the query parameter
 const urlParams = new URLSearchParams(window.location.search);
 const query = urlParams.get("q");
 
 //initial page load
-yt_call(query, vid_limit, "");
+yt_call(query)
 
-async function yt_call(query, length = 10, pageToken) {
+async function yt_call(query, pageToken) {
     let nextPage = "";
-    if (pageToken !== "") nextPage = `&pageToken=${pageToken}`;
+    if (pageToken !== "") nextPage = `&nextpage=${encodeURIComponent(pageToken)}`;
 
     try {
-        const url =
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
-                query,
-            )}&type=video&key=${API_KEY}&maxResults=${length}` + nextPage;
+        const url = `${base_url}search?q=${query}&filter=videos` + nextPage
 
         const response = await fetch(url);
         const data = await response.json();
-        //console.log(data)
+        console.log(data)
 
         if (data.items) {
             data.items.forEach((e) => {
+                if (e.isShort) {
+                    return;
+                }
                 const cell = document.createElement("div");
                 cell.setAttribute("class", "cell");
 
@@ -57,12 +69,12 @@ async function yt_call(query, length = 10, pageToken) {
                 title.setAttribute("class", "p-2 has-text-white");
 
                 const opener = document.createElement("a");
-                const id = "https://piped.video/watch?v=" + e.id.videoId;
+                const id = "https://piped.video" + e.url;
                 opener.setAttribute("href", id);
 
-                let vid_title = string_limit(e.snippet.title, 30);
+                let vid_title = string_limit(e.title, 35);
                 title.innerHTML = `${vid_title}`;
-                img.src = e.snippet.thumbnails.high.url;
+                img.src = e.thumbnail;
 
                 figure.appendChild(img);
                 card_image.appendChild(figure);
@@ -83,19 +95,19 @@ async function yt_call(query, length = 10, pageToken) {
         }
 
         // load more button
-        NextpageToken = data.nextPageToken;
-        if (NextpageToken && !button) {
+        NextPageUrl = data.nextpage;
+        if (NextPageUrl && !button) {
             button = document.createElement("button");
             button.setAttribute("class", "button is-rounded");
             button.setAttribute("id", "button");
             button.innerHTML = "Load More";
             container.appendChild(button);
             button.addEventListener("click", (event) => {
-                yt_call(query, vid_limit, NextpageToken);
+                yt_call(query, NextPageUrl);
             });
         } else {
             button.addEventListener("click", (event) => {
-                yt_call(query, vid_limit, NextpageToken);
+                yt_call(query, NextPageUrl);
             });
         }
     } catch (err) {
