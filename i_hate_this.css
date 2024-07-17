@@ -10,6 +10,11 @@
 }
 .logo img {
     max-height: 40px;
+    margin-right: -5px;
+}
+.logo .title {
+    margin-bottom: 0;
+    transform: translateY(2px);
 }
 .spacer {
     flex: 1;
