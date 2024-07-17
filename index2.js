@@ -3,16 +3,18 @@ const base_url = 'https://pipedapi.kavin.rocks/'
 
 const columns = document.querySelector("#columns");
 const container = document.querySelector("#container");
-let button;
+const Cell = document.querySelector(".cell")
+const inputField = document.querySelector("#input")
+const inputForm = document.querySelector("#inputForm")
+let isAtBottom = false;
 
-const vid_limit = 30;
 function string_limit(str, maxLength = 10) {
     if (str.length > maxLength) {
         return str.slice(0, maxLength - 3) + "..";
     }
     return str;
 }
-function time_stamp(sec){
+function timeFormat(sec){
     sec = Number(sec);
     var h = Math.floor(sec / 3600);
     var m = Math.floor(sec % 3600 / 60);
@@ -20,22 +22,32 @@ function time_stamp(sec){
 
     var hDisplay = h > 0 ? (h < 10 ? "0" + h + ":" : h + ":") : "";
     var mDisplay = m > 0 ? (m < 10 ? "0" + m + ":" : m + ":") : "";
-    var sDisplay = s > 0 ? (s < 10 ? "0" + s : s) : "";
+    var sDisplay = s >= 0 ? (s < 10 ? "0" + s : s) : "";
     return hDisplay + mDisplay + sDisplay;
 }
-
 // Get the query parameter
 const urlParams = new URLSearchParams(window.location.search);
 const query = urlParams.get("q");
+//console.log(query)
 
 //initial page load
-yt_call(query)
+piped_fetch(query)
 
-async function yt_call(query, pageToken) {
+// input field entry
+inputForm.addEventListener("submit", e => {
+    e.preventDefault();
+
+    columns.innerHTML = ""
+    piped_fetch(inputField.value)
+})
+
+async function piped_fetch(query, nextPageUrl) {
     let url = `${base_url}search?q=${query}&filter=videos`
 
-    if (pageToken !== undefined){
-        url = `${base_url}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(pageToken)}`;
+    //let url = query == null ? `${base_url}trending?region=IN` : `${base_url}search?q=${query}&filter=videos`
+
+    if (nextPageUrl !== undefined){
+        url = `${base_url}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
     }
 
     try {
@@ -78,7 +90,7 @@ async function yt_call(query, pageToken) {
 
                 const duration = document.createElement("div");
                 duration.setAttribute("class", "duration");
-                duration.innerHTML = time_stamp(e.duration);
+                duration.innerHTML = timeFormat(e.duration);
 
                 figure.appendChild(img);
                 figure.appendChild(duration)
@@ -99,20 +111,19 @@ async function yt_call(query, pageToken) {
             return;
         }
 
-        // load more button
         NextPageUrl = data.nextpage;
-        if (NextPageUrl && !button) {
-            button = document.createElement("button");
-            button.setAttribute("class", "button is-rounded");
-            button.setAttribute("id", "button");
-            button.innerHTML = "Load More";
-            container.appendChild(button);
-            button.addEventListener("click", (event) => {
-                yt_call(query, NextPageUrl);
-            });
-        } else {
-            button.addEventListener("click", (event) => {
-                yt_call(query, NextPageUrl);
+        if (NextPageUrl) {
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.innerHeight + window.scrollY;
+                const bodyHeight = document.body.offsetHeight;
+
+                if (scrollPosition >= bodyHeight - 5 && !isAtBottom) {
+                    isAtBottom = true;
+                    piped_fetch(query, NextPageUrl);
+                    console.log("next page loading");
+                } else if (scrollPosition < bodyHeight - 5) {
+                    isAtBottom = false;
+                }
             });
         }
     } catch (err) {
