@@ -6,6 +6,7 @@ const container = document.querySelector("#container");
 const Cell = document.querySelector(".cell")
 const inputField = document.querySelector("#input")
 const inputForm = document.querySelector("#inputForm")
+const selectField = document.querySelector("#select")
 let isAtBottom = false;
 
 function string_limit(str, maxLength = 10) {
@@ -28,25 +29,36 @@ function timeFormat(sec) {
 // Get the query parameter
 const urlParams = new URLSearchParams(window.location.search);
 const query = urlParams.get("q");
+if (query){
+    inputField.value = query
+}
 
 //initial page load
 piped_fetch(query)
 
 // input field entry
 inputForm.addEventListener("submit", e => {
+    const newURL = new URL(window.location.href);
     e.preventDefault();
 
     if (inputField.value !== "") {
+        const val = inputField.value
+        const sel = selectField.value
         columns.innerHTML = ""
-        piped_fetch(inputField.value)
+        piped_fetch(val, undefined, sel)
+
+        newURL.searchParams.set('q', val);
+        history.pushState({}, '', newURL)
     } else {
         columns.innerHTML = ""
+        newURL.searchParams.delete('q');
+        history.pushState({}, '', newURL)
         piped_fetch(null)
     }
 })
 
-async function piped_fetch(query, nextPageUrl) {
-    let url = query == null ? `${base_url}trending?region=IN` : `${base_url}search?q=${query}&filter=videos`
+async function piped_fetch(query, nextPageUrl, filter = "videos") {
+    let url = query == null ? `${base_url}trending?region=IN` : `${base_url}search?q=${query}&filter=${filter}`
 
     if (nextPageUrl !== undefined) {
         url = `${base_url}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
@@ -55,7 +67,7 @@ async function piped_fetch(query, nextPageUrl) {
     try {
         const response = await fetch(url);
         const data = await response.json();
-        //console.log(data)
+        console.log(data)
 
         if (data.items) {
             data.items.forEach(e => grid_loader(e))
@@ -78,7 +90,6 @@ async function piped_fetch(query, nextPageUrl) {
                 if (scrollPosition >= bodyHeight - 5 && !isAtBottom) {
                     isAtBottom = true;
                     piped_fetch(query, NextPageUrl);
-                    console.log("next page loading");
                 } else if (scrollPosition < bodyHeight - 5) {
                     isAtBottom = false;
                 }

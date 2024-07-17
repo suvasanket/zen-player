@@ -8,7 +8,7 @@
       href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css"
     />
     <title>yt-search</title>
-    <link rel="stylesheet" href="./dont_want.css" />
+    <link rel="stylesheet" href="./i_hate_this.css" />
   </head>
   <body>
     <header class="header">
@@ -18,8 +18,26 @@
       <div class="spacer"></div>
       <div class="search-bar">
         <form id="inputForm">
-          <input class="input is-rounded" type="text" placeholder="Search" id="input" />
+          <input
+            class="input is-rounded"
+            type="text"
+            placeholder="Search"
+            id="input"
+          />
         </form>
+      </div>
+      <div class="select is-rounded ml-2">
+        <select class="is-hovered" id="select">
+          <option value="videos">videos</option>
+          <option value="all">all</option>
+          <option value="playlists">playlists</option>
+          <option value="channels">channels</option>
+          <option value="music_songs">music_songs</option>
+          <option value="music_videos">music_videos</option>
+          <option value="music_albums">music_albums</option>
+          <option value="music_playlists">music_playlists</option>
+          <option value="music_artists">music_artists</option>
+        </select>
       </div>
       <div class="spacer"></div>
     </header>
