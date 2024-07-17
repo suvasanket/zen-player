@@ -1,0 +1,37 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /*padding: 10px;*/
+    margin: 25px;
+}
+.logo {
+    display: flex;
+    align-items: center;
+}
+.logo img {
+    max-height: 40px;
+}
+.spacer {
+    flex: 1;
+}
+.search-bar {
+    flex: 0 0 auto;
+    width: 500px; /* Adjust this width as needed */
+}
+.search-bar input {
+    width: 100%;
+}
+.card-image {
+    position: relative;
+}
+.duration {
+    font-size: 10px;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
