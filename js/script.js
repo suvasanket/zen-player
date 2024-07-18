@@ -37,26 +37,52 @@ function grid_loader(e) {
     img.setAttribute("id", "thumbnail");
     img.setAttribute("style", "object-fit: cover; object-position: center; width: 100%; height: 100%;")
 
-    const title = document.createElement("div");
-    title.setAttribute("class", "p-2 has-text-white is-size-7");
+    const footer = document.createElement("div");
+    footer.setAttribute("class", "m-2 pb-2");
+    footer.setAttribute("style", "display: flex; align-items: center")
 
-    const opener = document.createElement("a");
+    const channel_logo = document.createElement("img")
+    channel_logo.setAttribute("style", "height: 24; width: 24px; margin-right: 7px;")
+
+    const title = document.createElement("span")
+    title.setAttribute("class", "has-text-grey-lighter is-size-7 has-text-weight-bold")
+
+    const subtitle = document.createElement("span")
+    subtitle.setAttribute("class", "is-size-7 has-text-weight-normal")
+
+    const title_subtitle = document.createElement("div")
+    title_subtitle.setAttribute("style", "line-height: 1;")
+
+    const video_opener = document.createElement("a");
+    const channel_opener = document.createElement("a")
+    channel_opener.setAttribute("style", "display: flex; align-items: center; margin-right: 7px;")
 
     const duration = document.createElement("div");
     duration.setAttribute("class", "duration");
 
+    // show accroding to type
     if (type === "stream") {
         if (e.isShort) {
             return;
         }
-        opener.setAttribute("href", "https://piped.video" + e.url);
-        title.innerHTML = `${string_limit(e.title, 45)}`;
+        video_opener.setAttribute("href", "https://piped.video" + e.url);
+        channel_opener.setAttribute("href", "https://piped.video" + e.uploaderUrl);
+        title.innerHTML = `${string_limit(e.title, 37)}`;
+        subtitle.innerHTML = `${e.views} • ${e.uploadedDate}`
+        channel_logo.src = e.uploaderAvatar
         img.src = e.thumbnail;
         duration.innerHTML = timeFormat(e.duration);
+
+        channel_opener.appendChild(channel_logo)
+        footer.appendChild(channel_opener)
+        title_subtitle.appendChild(title)
+        title_subtitle.appendChild(document.createElement("br"))
+        title_subtitle.appendChild(subtitle)
+        footer.appendChild(title_subtitle)
     }
     else if (type === "playlist"){
-        opener.setAttribute("href", "https://piped.video" + e.url);
-        title.innerHTML = `${string_limit(e.name, 45)}`;
+        video_opener.setAttribute("href", "https://piped.video" + e.url);
+        footer.innerHTML = `${string_limit(e.name, 40)}`;
         img.src = e.thumbnail;
         duration.innerHTML = e.type
 
@@ -71,11 +97,11 @@ function grid_loader(e) {
     // add to html
     figure.appendChild(img);
     figure.appendChild(duration)
-    card_image.appendChild(figure);
-    card_image.appendChild(title);
-    opener.appendChild(card_image);
+    video_opener.appendChild(figure);
+    card_image.appendChild(video_opener);
+    card_image.appendChild(footer);
 
-    card.appendChild(opener);
+    card.appendChild(card_image);
     cell.appendChild(card);
 
     columns.appendChild(cell);

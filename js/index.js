@@ -1,7 +1,7 @@
 import { grid_loader } from "./script.js"
 
 let NextPageUrl = "";
-const base_url = 'https://pipedapi.kavin.rocks/'
+const api_base = 'https://pipedapi.kavin.rocks/'
 
 const columns = document.querySelector("#columns");
 const container = document.querySelector("#container");
@@ -42,23 +42,23 @@ inputForm.addEventListener("submit", e => {
 })
 
 async function piped_fetch(query, nextPageUrl, filter = "videos") {
-    let url = query == null ? `${base_url}trending?region=IN` : `${base_url}search?q=${query}&filter=${filter}`
+    let url = query == null ? `${api_base}trending?region=IN` : `${api_base}search?q=${query}&filter=${filter}`
 
     if (nextPageUrl !== undefined) {
-        url = `${base_url}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
+        url = `${api_base}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
     }
 
     try {
         const response = await fetch(url);
         const data = await response.json();
-        //console.log(data)
+        console.log(data)
 
         if (data.items) {
             data.items.forEach(e => grid_loader(e))
         } else if (data.error) {
-            console.error(data.error.message);
+            console.error(data.error);
             const notify = document.createElement("p")
-            notify.innerHTML = data.error.message
+            notify.innerHTML = data.message
             container.appendChild(notify)
             return;
         } else {
