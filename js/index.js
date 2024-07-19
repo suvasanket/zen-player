@@ -18,16 +18,15 @@ if (query) {
     inputField.value = query
 }
 
-window.addEventListener("resize", e => {
-    const width = e.target.innerWidth
-    if (width < 700){
-        fixed_grid.className = "fixed-grid has-1-cols"
-        document.querySelector("span.title").remove()
-    }
-    else {
-        fixed_grid.className = "fixed-grid has-5-cols"
-    }
-})
+// for mobile
+const win_width = window.innerWidth
+console.log(win_width)
+if (win_width < 700){
+    fixed_grid.className = "fixed-grid has-1-cols";
+    document.querySelector("span.title").remove();
+    document.querySelector(".search-bar").style.width = "250px";
+    document.querySelector("#selector").style.width = "52px";
+}
 
 //initial page load
 piped_fetch(query)
