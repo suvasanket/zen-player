@@ -51,7 +51,6 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
     try {
         const response = await fetch(url);
         const data = await response.json();
-        //console.log(data)
 
         if (data.items) {
             data.items.forEach(e => grid_loader(e))
