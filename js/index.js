@@ -9,6 +9,7 @@ const inputField = document.querySelector("#input")
 const inputForm = document.querySelector("#inputForm")
 const selectField = document.querySelector("#select")
 let isAtBottom = false;
+const fixed_grid = document.querySelector("#fixed-grid")
 
 // Get the query parameter
 const urlParams = new URLSearchParams(window.location.search);
@@ -16,6 +17,17 @@ const query = urlParams.get("q");
 if (query) {
     inputField.value = query
 }
+
+window.addEventListener("resize", e => {
+    const width = e.target.innerWidth
+    if (width < 700){
+        fixed_grid.className = "fixed-grid has-1-cols"
+        document.querySelector("span.title").remove()
+    }
+    else {
+        fixed_grid.className = "fixed-grid has-5-cols"
+    }
+})
 
 //initial page load
 piped_fetch(query)

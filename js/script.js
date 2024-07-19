@@ -24,13 +24,13 @@ function views_format(views) {
     let thousand = 1000
 
     if (views > bil) {
-        return Math.round(views / bil)+ "b"
+        return Math.round(views / bil)+ "B"
     }
     else if (views > mil) {
-        return Math.round(views / mil)+ "m"
+        return Math.round(views / mil)+ "M"
     }
     else if (views > thousand) {
-        return Math.round(views / thousand) + "k"
+        return Math.round(views / thousand) + "K"
     }
     else {
         return views.toString()
