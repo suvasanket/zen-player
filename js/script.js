@@ -6,6 +6,7 @@ function string_limit(str, maxLength = 10) {
 }
 
 function timeFormat(sec) {
+    if (sec == -1) return "live"
     sec = Number(sec);
     var h = Math.floor(sec / 3600);
     var m = Math.floor(sec % 3600 / 60);
@@ -88,8 +89,14 @@ function grid_loader(e) {
         video_opener.setAttribute("href", "https://piped.video" + e.url);
         channel_opener.setAttribute("href", "https://piped.video" + e.uploaderUrl);
         title.innerHTML = `${string_limit(e.title, 37)}`;
-        subtitle.innerHTML = `${views_format(e.views)} views • ${e.uploadedDate}`
+        if (e.uploadedDate){
+            subtitle.innerHTML = `${views_format(e.views)} views • ${e.uploadedDate}`
+        }
+        else {
+            subtitle.innerHTML = `${views_format(e.views)} watching`
+        }
         channel_logo.src = e.uploaderAvatar
+        channel_logo.alt = e.uploaderName
         img.src = e.thumbnail;
         duration.innerHTML = timeFormat(e.duration);
 
