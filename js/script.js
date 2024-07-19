@@ -4,6 +4,7 @@ function string_limit(str, maxLength = 10) {
     }
     return str;
 }
+
 function timeFormat(sec) {
     sec = Number(sec);
     var h = Math.floor(sec / 3600);
@@ -14,6 +15,25 @@ function timeFormat(sec) {
     var mDisplay = m > 0 ? (m < 10 ? "0" + m + ":" : m + ":") : "";
     var sDisplay = s >= 0 ? (s < 10 ? "0" + s : s) : "";
     return hDisplay + mDisplay + sDisplay;
+}
+
+function views_format(views) {
+    let bil = 1000000000
+    let mil = 1000000
+    let thousand = 1000
+
+    if (views > bil) {
+        return Math.round(views / bil)+ "b"
+    }
+    else if (views > mil) {
+        return Math.round(views / mil)+ "m"
+    }
+    else if (views > thousand) {
+        return Math.round(views / thousand) + "k"
+    }
+    else {
+        return views.toString()
+    }
 }
 
 // it takes each element and then append them to the main columns
@@ -68,7 +88,7 @@ function grid_loader(e) {
         video_opener.setAttribute("href", "https://piped.video" + e.url);
         channel_opener.setAttribute("href", "https://piped.video" + e.uploaderUrl);
         title.innerHTML = `${string_limit(e.title, 37)}`;
-        subtitle.innerHTML = `${e.views} • ${e.uploadedDate}`
+        subtitle.innerHTML = `${views_format(e.views)} views • ${e.uploadedDate}`
         channel_logo.src = e.uploaderAvatar
         img.src = e.thumbnail;
         duration.innerHTML = timeFormat(e.duration);
@@ -107,4 +127,3 @@ function grid_loader(e) {
     columns.appendChild(cell);
 }
 export { grid_loader }
-
