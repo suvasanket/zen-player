@@ -1,4 +1,5 @@
 const video_base = 'https://piped.video'
+let video_opt = ''
 
 function string_limit(str, maxLength = 10) {
     if (str.length > maxLength) {
@@ -39,6 +40,14 @@ function views_format(views) {
     }
 }
 
+//light mode
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+    video_opt += '&theme=light'
+}
+else {
+    video_opt += '&theme=dark'
+}
+
 // it takes each element and then append them to the main columns
 function grid_loader(e) {
     const type = e.type
@@ -68,7 +77,7 @@ function grid_loader(e) {
     channel_logo.setAttribute("style", "height: 24; width: 24px; margin-right: 7px;")
 
     const title = document.createElement("span")
-    title.setAttribute("class", "has-text-grey-lighter is-size-7 has-text-weight-bold")
+    title.setAttribute("class", "is-size-7 has-text-weight-bold")
 
     const subtitle = document.createElement("span")
     subtitle.setAttribute("class", "is-size-7 has-text-weight-normal")
@@ -97,8 +106,10 @@ function grid_loader(e) {
         if (e.isShort) {
             return;
         }
-        video_opener.setAttribute("href", video_base + e.url);
-        channel_opener.setAttribute("href", video_base + e.uploaderUrl);
+        const v_url = video_base + e.url + video_opt
+
+        video_opener.setAttribute("href", v_url);
+        channel_opener.setAttribute("href", video_base + e.uploaderUrl + video_opt);
         title.innerHTML = `${string_limit(e.title, 37)}`;
         if (e.uploadedDate){
             subtitle.innerHTML = `${views_format(e.views)} views • ${e.uploadedDate}`
@@ -110,10 +121,10 @@ function grid_loader(e) {
         channel_logo.alt = e.uploaderName
         img.src = e.thumbnail;
         duration.innerHTML = timeFormat(e.duration);
-        ['144', '1080', 'Auto'].forEach(el => {
+        ['144', '360', '720', '1080'].forEach(el => {
             const a = document.createElement("a")
-            a.setAttribute("href", video_base + e.url + "&quality=" + el)
-            a.innerHTML = el
+            a.setAttribute("href", v_url + "&quality=" + el)
+            a.innerHTML = el + "p"
             corner_content.appendChild(a)
         })
         corner_img.src = "../assets/play-circle-svgrepo-com.svg"
@@ -129,7 +140,7 @@ function grid_loader(e) {
         corner_icon.appendChild(corner_img)
     }
     else if (type === "playlist"){
-        video_opener.setAttribute("href", "https://piped.video" + e.url);
+        video_opener.setAttribute("href", v_url);
         footer.innerHTML = `${string_limit(e.name, 40)}`;
         img.src = e.thumbnail;
         duration.innerHTML = e.type

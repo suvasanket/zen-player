@@ -83,8 +83,10 @@
     color: #fff; /* White text color */
     text-decoration: none;
     font-size: 12px;
+    border-radius: 3px;
 }
 
 .hover-content a:hover {
-    text-decoration: underline;
+    color:black;
+    background-color: white;
 }
