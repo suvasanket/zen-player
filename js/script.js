@@ -1,5 +1,5 @@
 const video_base = 'https://piped.video'
-let video_opt = ''
+let video_opt = '&playerAutoPlay=true'
 
 function string_limit(str, maxLength = 10) {
     if (str.length > maxLength) {
@@ -149,7 +149,7 @@ function grid_loader(e) {
         corner_icon.appendChild(corner_img)
 
     }
-    else if (type === "channel"){
+    else if (type === "music"){
 
     }
     else {
