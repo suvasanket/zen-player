@@ -2,6 +2,7 @@ import { grid_loader } from "./script.js"
 
 let NextPageUrl = "";
 const api_base = 'https://pipedapi.kavin.rocks/'
+const video_base = 'https://piped.video'
 
 const columns = document.querySelector("#columns");
 const container = document.querySelector("#container");
@@ -20,7 +21,6 @@ if (query) {
 
 // for mobile
 const win_width = window.innerWidth
-console.log(win_width)
 if (win_width < 700){
     fixed_grid.className = "fixed-grid has-1-cols";
     document.querySelector("span.title").remove();
@@ -62,6 +62,7 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
     try {
         const response = await fetch(url);
         const data = await response.json();
+        //console.log(data)
 
         if (data.items) {
             data.items.forEach(e => grid_loader(e))

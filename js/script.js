@@ -1,3 +1,5 @@
+const video_base = 'https://piped.video'
+
 function string_limit(str, maxLength = 10) {
     if (str.length > maxLength) {
         return str.slice(0, maxLength - 3) + "..";
@@ -81,13 +83,22 @@ function grid_loader(e) {
     const duration = document.createElement("div");
     duration.setAttribute("class", "duration");
 
+    const corner_icon = document.createElement("div")
+    corner_icon.setAttribute("class", "icon-container")
+
+    const corner_img = document.createElement("img")
+    corner_img.setAttribute("style", "height: 24px; width: 24px;")
+
+    const corner_content = document.createElement("div")
+    corner_content.setAttribute("class", "hover-content")
+
     // show accroding to type
     if (type === "stream") {
         if (e.isShort) {
             return;
         }
-        video_opener.setAttribute("href", "https://piped.video" + e.url);
-        channel_opener.setAttribute("href", "https://piped.video" + e.uploaderUrl);
+        video_opener.setAttribute("href", video_base + e.url);
+        channel_opener.setAttribute("href", video_base + e.uploaderUrl);
         title.innerHTML = `${string_limit(e.title, 37)}`;
         if (e.uploadedDate){
             subtitle.innerHTML = `${views_format(e.views)} views • ${e.uploadedDate}`
@@ -99,6 +110,13 @@ function grid_loader(e) {
         channel_logo.alt = e.uploaderName
         img.src = e.thumbnail;
         duration.innerHTML = timeFormat(e.duration);
+        ['144', '1080', 'Auto'].forEach(el => {
+            const a = document.createElement("a")
+            a.setAttribute("href", video_base + e.url + "&quality=" + el)
+            a.innerHTML = el
+            corner_content.appendChild(a)
+        })
+        corner_img.src = "../assets/play-circle-svgrepo-com.svg"
 
         channel_opener.appendChild(channel_logo)
         footer.appendChild(channel_opener)
@@ -106,12 +124,18 @@ function grid_loader(e) {
         title_subtitle.appendChild(document.createElement("br"))
         title_subtitle.appendChild(subtitle)
         footer.appendChild(title_subtitle)
+
+        corner_icon.appendChild(corner_content)
+        corner_icon.appendChild(corner_img)
     }
     else if (type === "playlist"){
         video_opener.setAttribute("href", "https://piped.video" + e.url);
         footer.innerHTML = `${string_limit(e.name, 40)}`;
         img.src = e.thumbnail;
         duration.innerHTML = e.type
+
+        corner_img.src = "../assets/video-library-svgrepo-com.svg"
+        corner_icon.appendChild(corner_img)
 
     }
     else if (type === "channel"){
@@ -126,6 +150,7 @@ function grid_loader(e) {
     figure.appendChild(duration)
     video_opener.appendChild(figure);
     card_image.appendChild(video_opener);
+    card_image.appendChild(corner_icon);
     card_image.appendChild(footer);
 
     card.appendChild(card_image);
