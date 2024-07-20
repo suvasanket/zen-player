@@ -127,7 +127,7 @@ function grid_loader(e) {
             a.innerHTML = el + "p"
             corner_content.appendChild(a)
         })
-        corner_img.src = "../assets/play-circle-svgrepo-com.svg"
+        corner_img.src = "assets/play-circle-svgrepo-com.svg"
 
         channel_opener.appendChild(channel_logo)
         footer.appendChild(channel_opener)
@@ -145,7 +145,7 @@ function grid_loader(e) {
         img.src = e.thumbnail;
         duration.innerHTML = e.type
 
-        corner_img.src = "../assets/video-library-svgrepo-com.svg"
+        corner_img.src = "assets/video-library-svgrepo-com.svg"
         corner_icon.appendChild(corner_img)
 
     }
