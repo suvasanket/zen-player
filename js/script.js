@@ -1,7 +1,9 @@
 const video_base = 'https://piped.video'
 let video_opt = '&playerAutoPlay=true'
 
-function string_limit(str, maxLength = 10) {
+const gen = (element) => document.createElement(element)
+
+function stringLimit(str, maxLength = 10) {
     if (str.length > maxLength) {
         return str.slice(0, maxLength - 3) + "..";
     }
@@ -52,53 +54,53 @@ else {
 function grid_loader(e) {
     const type = e.type
 
-    const cell = document.createElement("div");
+    const cell = gen("div");
     cell.setAttribute("class", "cell");
 
-    const card = document.createElement("div");
+    const card = gen("div");
     card.setAttribute("class", "card");
 
-    const card_image = document.createElement("div");
+    const card_image = gen("div");
     card_image.setAttribute("class", "card-image");
 
-    const figure = document.createElement("figure");
+    const figure = gen("figure");
     figure.setAttribute("class", "image is-16by9");
     figure.setAttribute("style", "overflow: hidden;")
 
-    const img = document.createElement("img");
+    const img = gen("img");
     img.setAttribute("id", "thumbnail");
     img.setAttribute("style", "object-fit: cover; object-position: center; width: 100%; height: 100%;")
 
-    const footer = document.createElement("div");
+    const footer = gen("div");
     footer.setAttribute("class", "m-2 pb-2");
     footer.setAttribute("style", "display: flex; align-items: center")
 
-    const channel_logo = document.createElement("img")
+    const channel_logo = gen("img")
     channel_logo.setAttribute("style", "height: 24; width: 24px; margin-right: 7px;")
 
-    const title = document.createElement("span")
+    const title = gen("span")
     title.setAttribute("class", "is-size-7 has-text-weight-bold")
 
-    const subtitle = document.createElement("span")
+    const subtitle = gen("span")
     subtitle.setAttribute("class", "is-size-7 has-text-weight-normal")
 
-    const title_subtitle = document.createElement("div")
+    const title_subtitle = gen("div")
     title_subtitle.setAttribute("style", "line-height: 1;")
 
-    const video_opener = document.createElement("a");
-    const channel_opener = document.createElement("a")
+    const video_opener = gen("a");
+    const channel_opener = gen("a")
     channel_opener.setAttribute("style", "display: flex; align-items: center; margin-right: 7px;")
 
-    const duration = document.createElement("div");
+    const duration = gen("div");
     duration.setAttribute("class", "duration");
 
-    const corner_icon = document.createElement("div")
+    const corner_icon = gen("div")
     corner_icon.setAttribute("class", "icon-container")
 
-    const corner_img = document.createElement("img")
+    const corner_img = gen("img")
     corner_img.setAttribute("style", "height: 24px; width: 24px;")
 
-    const corner_content = document.createElement("div")
+    const corner_content = gen("div")
     corner_content.setAttribute("class", "hover-content")
 
     // show accroding to type
@@ -110,7 +112,7 @@ function grid_loader(e) {
 
         video_opener.setAttribute("href", v_url);
         channel_opener.setAttribute("href", video_base + e.uploaderUrl + video_opt);
-        title.innerHTML = `${string_limit(e.title, 37)}`;
+        title.innerHTML = `${stringLimit(e.title, 37)}`;
         if (e.uploadedDate){
             subtitle.innerHTML = `${views_format(e.views)} views • ${e.uploadedDate}`
         }
@@ -122,7 +124,7 @@ function grid_loader(e) {
         img.src = e.thumbnail;
         duration.innerHTML = timeFormat(e.duration);
         ['144', '360', '720', '1080'].forEach(el => {
-            const a = document.createElement("a")
+            const a = gen("a")
             a.setAttribute("href", v_url + "&quality=" + el)
             a.innerHTML = el + "p"
             corner_content.appendChild(a)
@@ -132,7 +134,7 @@ function grid_loader(e) {
         channel_opener.appendChild(channel_logo)
         footer.appendChild(channel_opener)
         title_subtitle.appendChild(title)
-        title_subtitle.appendChild(document.createElement("br"))
+        title_subtitle.appendChild(gen("br"))
         title_subtitle.appendChild(subtitle)
         footer.appendChild(title_subtitle)
 
@@ -141,7 +143,7 @@ function grid_loader(e) {
     }
     else if (type === "playlist"){
         video_opener.setAttribute("href", v_url);
-        footer.innerHTML = `${string_limit(e.name, 40)}`;
+        footer.innerHTML = `${stringLimit(e.name, 40)}`;
         img.src = e.thumbnail;
         duration.innerHTML = e.type
 
