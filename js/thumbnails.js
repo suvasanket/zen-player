@@ -1,7 +1,10 @@
-const video_base = 'https://piped.video'
+const piped_domain = 'https://piped.video'
 let video_opt = '&playerAutoPlay=true'
 
 const gen = (element) => document.createElement(element)
+
+const quality = ['144', '240', '360', '720']
+quality.push('Download')
 
 function stringLimit(str, maxLength = 10) {
     if (str.length > maxLength) {
@@ -29,10 +32,10 @@ function views_format(views) {
     let thousand = 1000
 
     if (views > bil) {
-        return Math.round(views / bil)+ "B"
+        return Math.round(views / bil) + "B"
     }
     else if (views > mil) {
-        return Math.round(views / mil)+ "M"
+        return Math.round(views / mil) + "M"
     }
     else if (views > thousand) {
         return Math.round(views / thousand) + "K"
@@ -108,12 +111,12 @@ function grid_loader(e) {
         if (e.isShort) {
             return;
         }
-        const v_url = video_base + e.url + video_opt
+        const v_url = piped_domain + e.url + video_opt
 
         video_opener.setAttribute("href", v_url);
-        channel_opener.setAttribute("href", video_base + e.uploaderUrl + video_opt);
+        channel_opener.setAttribute("href", piped_domain + e.uploaderUrl + video_opt);
         title.innerHTML = `${stringLimit(e.title, 37)}`;
-        if (e.uploadedDate){
+        if (e.uploadedDate) {
             subtitle.innerHTML = `${views_format(e.views)} views • ${e.uploadedDate}`
         }
         else {
@@ -123,10 +126,17 @@ function grid_loader(e) {
         channel_logo.alt = e.uploaderName
         img.src = e.thumbnail;
         duration.innerHTML = timeFormat(e.duration);
-        ['144', '360', '720', '1080'].forEach(el => {
+        // the corner thingy
+        quality.forEach(el => {
             const a = gen("a")
-            a.setAttribute("href", v_url + "&quality=" + el)
-            a.innerHTML = el + "p"
+            if (el === 'Download') {
+                a.setAttribute("class", "js-modal-trigger")
+                a.setAttribute("data-target", "downloader-modal")
+                a.innerHTML = el
+            } else {
+                a.setAttribute("href", v_url + "&quality=" + el)
+                a.innerHTML = el + "p"
+            }
             corner_content.appendChild(a)
         })
         corner_img.src = "assets/play-circle-svgrepo-com.svg"
@@ -141,7 +151,7 @@ function grid_loader(e) {
         corner_icon.appendChild(corner_content)
         corner_icon.appendChild(corner_img)
     }
-    else if (type === "playlist"){
+    else if (type === "playlist") {
         video_opener.setAttribute("href", v_url);
         footer.innerHTML = `${stringLimit(e.name, 40)}`;
         img.src = e.thumbnail;
@@ -151,7 +161,7 @@ function grid_loader(e) {
         corner_icon.appendChild(corner_img)
 
     }
-    else if (type === "music"){
+    else if (type === "music") {
 
     }
     else {
@@ -171,4 +181,6 @@ function grid_loader(e) {
 
     columns.appendChild(cell);
 }
+
+
 export { grid_loader }
