@@ -27,6 +27,18 @@ if (win_width < 700) {
     document.querySelector("#selector").style.width = "52px";
 }
 
+//
+document.querySelector(".logo").addEventListener("click", event => {
+    event.preventDefault();
+
+    const copy_url = new URL(window.location.href)
+    copy_url.searchParams.delete('q')
+    history.pushState({}, '', copy_url)
+    inputField.value = ""
+    piped_fetch(null)
+    window.location.reload()
+})
+
 //initial page load
 piped_fetch(query)
 
