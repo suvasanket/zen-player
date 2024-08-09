@@ -1,7 +1,20 @@
+import { modal_loader } from "./downloader.js"
+
 const piped_domain = 'https://piped.video'
 let video_opt = '&playerAutoPlay=true'
 
-const gen = (element) => document.createElement(element)
+const gen = (tag) => {
+    let element = document.createElement(tag)
+    element.attr = function(attr, val) {
+        this.setAttribute(attr, val)
+        return this
+    }
+    element.inner = function (val) {
+        this.innerHTML = val
+        return this
+    }
+    return element
+}
 
 const quality = ['144', '240', '360', '720']
 quality.push('Download')
@@ -54,85 +67,89 @@ else {
 }
 
 // it takes each element and then append them to the main columns
-function grid_loader(e) {
+function grid_loader(e, index) {
     const type = e.type
 
-    const cell = gen("div");
-    cell.setAttribute("class", "cell");
+    const cell = gen("div")
+        .attr("class", "cell")
 
-    const card = gen("div");
-    card.setAttribute("class", "card");
+    const card = gen("div")
+        .attr("class", "card");
 
-    const card_image = gen("div");
-    card_image.setAttribute("class", "card-image");
+    const card_image = gen("div")
+        .attr("class", "card-image");
 
-    const figure = gen("figure");
-    figure.setAttribute("class", "image is-16by9");
-    figure.setAttribute("style", "overflow: hidden;")
+    const figure = gen("figure")
+        .attr("class", "image is-16by9")
+        .attr("style", "overflow: hidden;")
 
-    const img = gen("img");
-    img.setAttribute("id", "thumbnail");
-    img.setAttribute("style", "object-fit: cover; object-position: center; width: 100%; height: 100%;")
+    const img = gen("img")
+        .attr("id", "thumbnail")
+        .attr("style", "object-fit: cover; object-position: center; width: 100%; height: 100%;")
 
-    const footer = gen("div");
-    footer.setAttribute("class", "m-2 pb-2");
-    footer.setAttribute("style", "display: flex; align-items: center")
-
-    const channel_logo = gen("img")
-    channel_logo.setAttribute("style", "height: 24; width: 24px; margin-right: 7px;")
-
-    const title = gen("span")
-    title.setAttribute("class", "is-size-7 has-text-weight-bold")
+    const footer = gen("div")
+        .attr("class", "m-2 pb-2")
+        .attr("style", "display: flex; align-items: center")
 
     const subtitle = gen("span")
-    subtitle.setAttribute("class", "is-size-7 has-text-weight-normal")
+        .attr("class", "is-size-7 has-text-weight-normal")
 
     const title_subtitle = gen("div")
-    title_subtitle.setAttribute("style", "line-height: 1;")
+        .attr("style", "line-height: 1;")
 
-    const video_opener = gen("a");
-    const channel_opener = gen("a")
-    channel_opener.setAttribute("style", "display: flex; align-items: center; margin-right: 7px;")
-
-    const duration = gen("div");
-    duration.setAttribute("class", "duration");
+    const duration = gen("div")
+        .attr("class", "duration");
 
     const corner_icon = gen("div")
-    corner_icon.setAttribute("class", "icon-container")
+        .attr("class", "icon-container")
 
     const corner_img = gen("img")
-    corner_img.setAttribute("style", "height: 24px; width: 24px;")
+        .attr("style", "height: 24px; width: 24px;")
 
     const corner_content = gen("div")
-    corner_content.setAttribute("class", "hover-content")
+        .attr("class", "hover-content")
 
+    const video_opener = gen("a")
     // show accroding to type
     if (type === "stream") {
         if (e.isShort) {
             return;
         }
         const v_url = piped_domain + e.url + video_opt
-
         video_opener.setAttribute("href", v_url);
-        channel_opener.setAttribute("href", piped_domain + e.uploaderUrl + video_opt);
-        title.innerHTML = `${stringLimit(e.title, 37)}`;
+
+        const channel_opener = gen("a")
+            .attr("style", "display: flex; align-items: center; margin-right: 7px;")
+            .attr("href", piped_domain + e.uploaderUrl + video_opt);
+
+        const title = gen("span")
+            .attr("class", "is-size-7 has-text-weight-bold")
+            .inner(`${stringLimit(e.title, 37)}`)
+
         if (e.uploadedDate) {
             subtitle.innerHTML = `${views_format(e.views)} views • ${e.uploadedDate}`
         }
         else {
             subtitle.innerHTML = `${views_format(e.views)} watching`
         }
+
+        const channel_logo = gen("img")
+            .attr("style", "height: 24; width: 24px; margin-right: 7px;")
         channel_logo.src = e.uploaderAvatar
         channel_logo.alt = e.uploaderName
+
         img.src = e.thumbnail;
+
         duration.innerHTML = timeFormat(e.duration);
+
         // the corner thingy
         quality.forEach(el => {
             const a = gen("a")
             if (el === 'Download') {
-                a.setAttribute("class", "js-modal-trigger")
-                a.setAttribute("data-target", "downloader-modal")
+                a.setAttribute("class", "downloader-trigger")
+                a.setAttribute("data-target", "downloader-modal" + index)
                 a.innerHTML = el
+                modal_loader(index, e.title, e.url)
             } else {
                 a.setAttribute("href", v_url + "&quality=" + el)
                 a.innerHTML = el + "p"
@@ -148,8 +165,8 @@ function grid_loader(e) {
         title_subtitle.appendChild(subtitle)
         footer.appendChild(title_subtitle)
 
-        corner_icon.appendChild(corner_content)
         corner_icon.appendChild(corner_img)
+        corner_icon.appendChild(corner_content)
     }
     else if (type === "playlist") {
         video_opener.setAttribute("href", v_url);
@@ -183,4 +200,4 @@ function grid_loader(e) {
 }
 
 
-export { grid_loader }
+export { grid_loader, gen }
