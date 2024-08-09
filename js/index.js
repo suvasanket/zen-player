@@ -1,8 +1,7 @@
-import { grid_loader } from "./thumbnails.js"
+import { grid_loader, gen } from "./thumbnails.js"
 
 let NextPageUrl = "";
 const api_base = 'https://pipedapi.kavin.rocks/'
-//const video_base = 'https://piped.video'
 
 const columns = document.querySelector("#columns");
 const container = document.querySelector("#container");
@@ -52,16 +51,32 @@ inputForm.addEventListener("submit", e => {
     }
 })
 
+function spiner_start() {
+    const spin_container = gen("div")
+        .attr("class", "container is-flex is-justify-content-center is-align-items-center")
+        .attr("id", "spiner")
+        .attr("style", "height: 200px;")
+    const spin_button = gen("button")
+        .attr("class", "button is-large is-link is-loading ")
+        .attr("style", "border: none; background: transparent; box-shadow: none;")
+    spin_container.appendChild(spin_button)
+    container.prepend(spin_container)
+}
+function spiner_stop() {
+    document.querySelector("#spiner").remove()
+}
+
 async function piped_fetch(query, nextPageUrl, filter = "videos") {
     let url = query == null ? `${api_base}trending?region=IN` : `${api_base}search?q=${query}&filter=${filter}`
 
     if (nextPageUrl !== undefined) {
         url = `${api_base}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
     }
-
     try {
+        spiner_start()
         const response = await fetch(url);
         const data = await response.json();
+        spiner_stop()
         //console.log(data)
 
         if (data.items) {
@@ -97,34 +112,7 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
     }
 }
 
-//const tabs = ["Pictures", "Music", "Videos", "Documents"];
-//const tabList = document.getElementById('tab-list');
-//
-//// Dynamically create and append tabs
-//tabs.forEach((tab, index) => {
-//    const li = document.createElement('li');
-//    const a = document.createElement('a');
-//    const span = document.createElement('span');
-//    span.textContent = tab;
-//    a.appendChild(span);
-//    li.appendChild(a);
-//
-//    // Make the first tab active by default
-//    if (index === 0) {
-//        li.classList.add('is-active');
-//    }
-//
-//    // Add click event to handle active state
-//    li.addEventListener('click', function() {
-//        document.querySelector('#tab-list li.is-active').classList.remove('is-active');
-//        this.classList.add('is-active');
-//    });
-//
-//    tabList.appendChild(li);
-//});
-
 const modal_detector_loader = () => {
-    console.log("modal loaded")
     // Functions to open and close a modal
     function openModal($el) {
         $el.classList.add('is-active');

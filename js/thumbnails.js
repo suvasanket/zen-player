@@ -1,6 +1,7 @@
 import { modal_loader } from "./downloader.js"
 
 const piped_domain = 'https://piped.video'
+const yt_domain = "https://www.youtube.com"
 let video_opt = '&playerAutoPlay=true'
 
 const gen = (tag) => {
@@ -9,7 +10,7 @@ const gen = (tag) => {
         this.setAttribute(attr, val)
         return this
     }
-    element.inner = function (val) {
+    element.inner = function(val) {
         this.innerHTML = val
         return this
     }
@@ -115,7 +116,12 @@ function grid_loader(e, index) {
         if (e.isShort) {
             return;
         }
-        const v_url = piped_domain + e.url + video_opt
+
+        // heuristic site opener
+        let v_url = piped_domain + e.url + video_opt
+        if (e.duration === -1) {
+            v_url = yt_domain + e.url
+        }
         video_opener.setAttribute("href", v_url);
 
         const channel_opener = gen("a")
