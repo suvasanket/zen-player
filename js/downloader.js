@@ -48,7 +48,7 @@ let quality_val = '144'
 let codec_val = 'h264'
 let filestyle_val = 'basic'
 
-function option_generator(parent, opts, callback) {
+function option_generator(inu, parent, opts, callback) {
     opts.forEach((opt, index) => {
         const li = document.createElement('li');
         const a = document.createElement('a');
@@ -68,7 +68,7 @@ function option_generator(parent, opts, callback) {
         li.addEventListener('click', function() {
             parent.querySelector('li.is-active').classList.remove('is-active');
             this.classList.add('is-active');
-            download_btn_refresh("#", "generate", document.querySelector("#download_btn"))
+            download_btn_refresh("#", "generate", document.querySelector(`#download_btn${inu}`))
             callback(opt)
         });
     });
@@ -98,25 +98,25 @@ function modal_loader(index, title, url) {
     //opts
     const audio = gen("div").attr("class", "tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
     let audio_selector = gen("ul").attr("id", "audio_selector")
-    audio_val = option_generator(audio_selector, audio_opts, (e) => { audio_val = e })
+    audio_val = option_generator(index, audio_selector, audio_opts, (e) => { audio_val = e })
 
     const quality = gen("div").attr("class", "tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
     const quality_selector = gen("ul").attr("id", "quality_selector")
-    option_generator(quality_selector, quality_opts, (e) => { quality_val = e })
+    option_generator(index, quality_selector, quality_opts, (e) => { quality_val = e })
 
     const codec = gen("div").attr("class", "tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
     let codec_selector = gen("ul").attr("id", "codec_selector")
-    option_generator(codec_selector, codec_opts, (e) => { codec_val = e })
+    option_generator(index, codec_selector, codec_opts, (e) => { codec_val = e })
 
     const filestyle = gen("div").attr("class", "tabs is-small is-toggle is-centered is-fullwidth mt-4 mb-4")
     const filestyle_selector = gen("ul").attr("id", "filestyle_selector")
-    option_generator(filestyle_selector, filestyle_opts, (e) => { filestyle_val = e })
+    option_generator(index, filestyle_selector, filestyle_opts, (e) => { filestyle_val = e })
     //opts
 
     const footer = gen("footer")
     let download_btn = gen("a")
         .attr("href", "#")
-        .attr("id", "download_btn")
+        .attr("id", `download_btn${index}`)
         .attr("class", "button is-primary is-dark")
         .inner("generate")
 
