@@ -1,13 +1,14 @@
 import { gen } from './thumbnails.js'
 const yt_domain = "https://www.youtube.com"
 
-async function Cobalt(vurl, audio, quality, codec, filestyle) {
+async function Cobalt(vurl, audio, quality, codec, filestyle, dub) {
     const url = yt_domain + vurl
     //console.log(vurl)
     //console.log(audio)
     //console.log(quality)
     //console.log(codec)
     //console.log(filestyle)
+    //console.log(dub)
 
     try {
         const fetched = await fetch("https://api.cobalt.tools/api/json", {
@@ -24,6 +25,7 @@ async function Cobalt(vurl, audio, quality, codec, filestyle) {
                 filenamePattern: filestyle,
                 isAudioOnly: audio,
                 disableMetadata: true,
+                dubLang: dub,
             }),
 
         })
@@ -39,7 +41,7 @@ async function Cobalt(vurl, audio, quality, codec, filestyle) {
 }
 
 const audio_opts = ["video", "audio"]
-const quality_opts = ["144", "240", "360", "480", "720", "1080"]
+const quality_opts = ["144", "240", "360", "480", "720", "1080", "2160", "max"]
 const codec_opts = ["h264", "av1", "vp9"]
 const filestyle_opts = ["basic", "pretty", "classic", "nerdy"]
 
@@ -47,8 +49,9 @@ let audio_val = false
 let quality_val = '144'
 let codec_val = 'h264'
 let filestyle_val = 'basic'
+let dub_val = false
 
-function option_generator(inu, parent, opts, callback) {
+function option_generator(inudeks, parent, opts, callback) {
     opts.forEach((opt, index) => {
         const li = document.createElement('li');
         const a = document.createElement('a');
@@ -68,7 +71,7 @@ function option_generator(inu, parent, opts, callback) {
         li.addEventListener('click', function() {
             parent.querySelector('li.is-active').classList.remove('is-active');
             this.classList.add('is-active');
-            download_btn_refresh("#", "generate", document.querySelector(`#download_btn${inu}`))
+            download_btn_refresh("#", "generate", document.querySelector(`#download_btn${inudeks}`))
             callback(opt)
         });
     });
@@ -89,11 +92,28 @@ function modal_loader(index, title, url) {
         .attr("id", "downloader-modal" + index)
     const modal_bg = gen("div").attr("class", "modal-background")
     const modal_cont = gen("div").attr("class", "modal-content m-3")
-    const box = gen("div").attr("class", "box")
+    const box = gen("div").attr("class", "box is-family-monospace")
     const H = gen("p")
-        .attr("class", "title")
+        .attr("class", "title is-family-primary	")
         .inner("Download")
-    const vtitle = gen("p").inner(title)
+    const vtitle = gen("p")
+        .attr("class", "subtitle is-6 mt-3 mb-3")
+        .inner(title)
+
+    const quality_title = gen("div").attr("class", "title is-6 mb-1").inner("Quality")
+    const codec_title = gen("div").attr("class", "title is-6 mb-1").inner("Codec")
+    const filestyle_title = gen("div").attr("class", "title is-6 mb-1").inner("FileName")
+
+    const quality_subtitle = gen("p").attr("class", "is-size-7")
+        .inner(`If the selected quality is not available, the closest quality will be used`)
+    const codec_subtitle = gen("p").attr("class", "is-size-7")
+    codec_subtitle.innerHTML = `
+        h264: supported in all platforms, avg. details, max quality 1080.<br>
+        av1: best quality, small file, supports 4k & HDR.<br>
+        vp9: best quality, double file size, supports 4k & HDR.
+        `
+    const filestyle_subtitle = gen("p").attr("class", "is-size-7")
+        .inner(`How the file should be named`)
 
     //opts
     const audio = gen("div").attr("class", "tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
@@ -111,6 +131,14 @@ function modal_loader(index, title, url) {
     const filestyle = gen("div").attr("class", "tabs is-small is-toggle is-centered is-fullwidth mt-4 mb-4")
     const filestyle_selector = gen("ul").attr("id", "filestyle_selector")
     option_generator(index, filestyle_selector, filestyle_opts, (e) => { filestyle_val = e })
+
+    const dub_l = gen("label")
+        .attr("class", "is-size-7")
+        .inner(` Dub-Audio (Browser language)`)
+    const dub_selector = gen("input").attr("type", "checkbox")
+    dub_l.prepend(dub_selector)
+    const dub = gen("div").attr("class", "card p-3").attr("style", "display: inline-block; width: auto; max - width: 100 %; ")
+    dub.appendChild(dub_l)
     //opts
 
     const footer = gen("footer")
@@ -131,9 +159,17 @@ function modal_loader(index, title, url) {
     box.appendChild(H)
     box.appendChild(vtitle)
     box.appendChild(audio)
+    box.appendChild(quality_title)
+    box.appendChild(quality_subtitle)
     box.appendChild(quality)
+    box.appendChild(codec_title)
+    box.appendChild(codec_subtitle)
     box.appendChild(codec)
+    box.appendChild(filestyle_title)
+    box.appendChild(filestyle_subtitle)
     box.appendChild(filestyle)
+    box.appendChild(dub)
+
     box.appendChild(footer)
 
     modal_cont.appendChild(box)
@@ -144,17 +180,35 @@ function modal_loader(index, title, url) {
     downloader_modals.appendChild(modal)
     document.body.appendChild(downloader_modals)
 
+    dub_selector.addEventListener('change', () => {
+        if (dub_selector.checked) {
+            dub_val = true
+        }
+        else {
+            dub_val = false
+        }
+    })
+
     download_btn.addEventListener('click', async function() {
-        if (download_btn.getAttribute("href") === "#") {
+        const b_text = download_btn.innerText
+        if (b_text === "generate") {
             console.log("download generation initiated")
             download_btn.className = "button is-primary is-dark is-loading"
 
             audio_val = audio_val === "audio" ? true : false
-            const cobaltLink = await Cobalt(url, audio_val, quality_val, codec_val, filestyle_val);
+            const cobaltLink = await Cobalt(url, audio_val, quality_val, codec_val, filestyle_val, dub_val);
 
             download_btn_refresh(cobaltLink, "Download", download_btn);
         }
-    });
+        if (b_text === "Download") {
+            const modal = document.querySelectorAll('.modal') || [];
+            setTimeout(function() {
+                modal.forEach(mod => {
+                    mod.classList.remove('is-active');
+                })
+            }, 1500)
+        }
+    })
 }
 
 export { modal_loader }
