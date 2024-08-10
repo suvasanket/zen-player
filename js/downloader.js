@@ -41,7 +41,7 @@ async function Cobalt(vurl, audio, quality, codec, filestyle, dub) {
 }
 
 const audio_opts = ["video", "audio"]
-const quality_opts = ["144", "240", "360", "480", "720", "1080", "2160", "max"]
+const quality_opts = ["144", "240", "360", "480", "720", "1080", "4K", "8K+"]
 const codec_opts = ["h264", "av1", "vp9"]
 const filestyle_opts = ["basic", "pretty", "classic", "nerdy"]
 
@@ -196,6 +196,9 @@ function modal_loader(index, title, url) {
             download_btn.className = "button is-primary is-dark is-loading"
 
             audio_val = audio_val === "audio" ? true : false
+            if(quality_val === "4K") quality_val = 2160
+            if(quality_val === "8K+") quality_val = max
+
             const cobaltLink = await Cobalt(url, audio_val, quality_val, codec_val, filestyle_val, dub_val);
 
             download_btn_refresh(cobaltLink, "Download", download_btn);
