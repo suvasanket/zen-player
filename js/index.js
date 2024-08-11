@@ -78,11 +78,13 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
     if (nextPageUrl !== undefined) {
         url = `${api_base}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
     }
-    try {
+    else {
         spiner_start()
+    }
+    try {
         const response = await fetch(url);
         const data = await response.json();
-        spiner_stop()
+        if(document.querySelector("#spiner")) spiner_stop()
         //console.log(data.items.length)
 
         if (data.items) {

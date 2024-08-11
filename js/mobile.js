@@ -2,6 +2,7 @@ const fixed_grid = document.querySelector("#fixed-grid")
 const logo = document.querySelector(".logo");
 const search_bar = document.querySelector(".search-bar")
 const selector = document.querySelector("#selector")
+//const modal = document.getElementsByClassName("modal")
 
 // if a touch device
 function isTouchDevice() {
@@ -17,8 +18,7 @@ if (isSmallWidthDevice() || isTouchDevice()) {
     fixed_grid.className = "fixed-grid has-1-cols";
 
     logo.children[1].remove()
-    logo.children[0].style.height = "90px"
-    search_bar.style.width = "250px"
-    selector.style.width = "55px"
+    search_bar.style.width = "230px"
+    selector.style.width = "53px"
 }
 
