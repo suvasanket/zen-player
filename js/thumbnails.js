@@ -171,8 +171,8 @@ function grid_loader(e, index) {
         title_subtitle.appendChild(subtitle)
         footer.appendChild(title_subtitle)
 
-        corner_icon.appendChild(corner_img)
         corner_icon.appendChild(corner_content)
+        corner_icon.appendChild(corner_img)
     }
     else if (type === "playlist") {
         video_opener.setAttribute("href", v_url);

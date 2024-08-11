@@ -1,7 +1,8 @@
 import { grid_loader, gen } from "./thumbnails.js"
+const api_base = 'https://pipedapi.kavin.rocks/'
 
 let NextPageUrl = "";
-const api_base = 'https://pipedapi.kavin.rocks/'
+let IfLessThan20Res = true
 
 const columns = document.querySelector("#columns");
 const container = document.querySelector("#container");
@@ -9,7 +10,6 @@ const inputField = document.querySelector("#input")
 const inputForm = document.querySelector("#inputForm")
 const selectField = document.querySelector("#select")
 let isAtBottom = false;
-const fixed_grid = document.querySelector("#fixed-grid")
 
 // Get the query parameter
 const urlParams = new URLSearchParams(window.location.search);
@@ -18,16 +18,7 @@ if (query) {
     inputField.value = query
 }
 
-// for mobile
-const win_width = window.innerWidth
-if (win_width < 700) {
-    fixed_grid.className = "fixed-grid has-1-cols";
-    document.querySelector("span.title").remove();
-    document.querySelector(".search-bar").style.width = "250px";
-    document.querySelector("#selector").style.width = "52px";
-}
-
-//
+// Home clicking the logo
 document.querySelector(".logo").addEventListener("click", event => {
     event.preventDefault();
 
@@ -55,6 +46,8 @@ inputForm.addEventListener("submit", e => {
 
         newURL.searchParams.set('q', val);
         history.pushState({}, '', newURL)
+
+        IfLessThan20Res = true
     } else {
         columns.innerHTML = ""
         newURL.searchParams.delete('q');
@@ -90,7 +83,7 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
         const response = await fetch(url);
         const data = await response.json();
         spiner_stop()
-        //console.log(data)
+        //console.log(data.items.length)
 
         if (data.items) {
             data.items.forEach((e, index) => grid_loader(e, index))
@@ -104,9 +97,15 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
             data.forEach((e, index) => grid_loader(e, index))
         }
 
-        // auto next page loader
+        // Got the next page URL
         NextPageUrl = data.nextpage;
         if (NextPageUrl) {
+            // if less than 20 results then do a nextpage reload
+            const len = data.items.length || data.length;
+            if (len - 1 < 20 && len !== 0 && IfLessThan20Res) {
+                piped_fetch(query, NextPageUrl)
+                IfLessThan20Res = false
+            }
             window.addEventListener('scroll', function() {
                 const scrollPosition = window.innerHeight + window.scrollY;
                 const bodyHeight = document.body.offsetHeight;
@@ -126,12 +125,13 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
 }
 
 const modal_detector_loader = () => {
-    // Functions to open and close a modal
     function openModal($el) {
+        document.querySelector("HTML").classList.add('is-clipped');
         $el.classList.add('is-active');
     }
 
     function closeModal($el) {
+        document.querySelector("HTML").classList.remove('is-clipped');
         $el.classList.remove('is-active');
     }
 
