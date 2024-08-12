@@ -152,10 +152,11 @@ function grid_loader(e, index) {
         quality.forEach(el => {
             const a = gen("a")
             if (el === 'Download') {
+                const unique_id = e.url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:\?|&|$)/)
                 a.setAttribute("class", "downloader-trigger")
-                a.setAttribute("data-target", "downloader-modal" + index)
+                a.setAttribute("data-target", "downloader-modal" + unique_id[1])
                 a.innerHTML = el
-                modal_loader(index, e.title, e.url)
+                modal_loader(e.title, e.url)
             } else {
                 a.setAttribute("href", v_url + "&quality=" + el)
                 a.innerHTML = el + "p"

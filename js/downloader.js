@@ -1,5 +1,6 @@
 import { gen } from './thumbnails.js'
 const yt_domain = "https://www.youtube.com"
+const cobalt_api = "https://api.cobalt.tools/api/json"
 
 async function Cobalt(vurl, audio, quality, codec, filestyle, dub) {
     const url = yt_domain + vurl
@@ -11,7 +12,7 @@ async function Cobalt(vurl, audio, quality, codec, filestyle, dub) {
     //console.log(dub)
 
     try {
-        const fetched = await fetch("https://api.cobalt.tools/api/json", {
+        const fetched = await fetch(cobalt_api, {
             method: "POST",
             headers: {
                 "Cache-Control": "no-cache",
@@ -51,7 +52,7 @@ let codec_val = 'h264'
 let filestyle_val = 'basic'
 let dub_val = false
 
-function option_generator(inudeks, parent, opts, callback) {
+function option_generator(unique_id, parent, opts, callback) {
     opts.forEach((opt, index) => {
         const li = document.createElement('li');
         const a = document.createElement('a');
@@ -71,7 +72,7 @@ function option_generator(inudeks, parent, opts, callback) {
         li.addEventListener('click', function() {
             parent.querySelector('li.is-active').classList.remove('is-active');
             this.classList.add('is-active');
-            download_btn_refresh("#", "generate", document.querySelector(`#download_btn${inudeks}`))
+            download_btn_refresh("#", "generate", document.querySelector(`#download_btn${unique_id}`))
             callback(opt)
         });
     });
@@ -84,12 +85,13 @@ function download_btn_refresh(link, inner, download_btn) {
 }
 
 
-function modal_loader(index, title, url) {
+function modal_loader(title, url) {
     const downloader_modals = document.createDocumentFragment()
+    const unique_id = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:\?|&|$)/) //[v=asdas, asdas]
 
     const modal = gen("div")
         .attr("class", "modal")
-        .attr("id", "downloader-modal" + index)
+        .attr("id", "downloader-modal" + unique_id[1])
     const modal_bg = gen("div").attr("class", "modal-background")
     const modal_cont = gen("div").attr("class", "modal-content m-3")
     const box = gen("div").attr("class", "box is-family-monospace")
@@ -118,19 +120,19 @@ function modal_loader(index, title, url) {
     //opts
     const audio = gen("div").attr("class", "tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
     let audio_selector = gen("ul").attr("id", "audio_selector")
-    audio_val = option_generator(index, audio_selector, audio_opts, (e) => { audio_val = e })
+    audio_val = option_generator(unique_id[1], audio_selector, audio_opts, (e) => { audio_val = e })
 
     const quality = gen("div").attr("class", "tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
     const quality_selector = gen("ul").attr("id", "quality_selector")
-    option_generator(index, quality_selector, quality_opts, (e) => { quality_val = e })
+    option_generator(unique_id[1], quality_selector, quality_opts, (e) => { quality_val = e })
 
     const codec = gen("div").attr("class", "tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
     let codec_selector = gen("ul").attr("id", "codec_selector")
-    option_generator(index, codec_selector, codec_opts, (e) => { codec_val = e })
+    option_generator(unique_id[1], codec_selector, codec_opts, (e) => { codec_val = e })
 
     const filestyle = gen("div").attr("class", "tabs is-small is-toggle is-centered is-fullwidth mt-4 mb-4")
     const filestyle_selector = gen("ul").attr("id", "filestyle_selector")
-    option_generator(index, filestyle_selector, filestyle_opts, (e) => { filestyle_val = e })
+    option_generator(unique_id[1], filestyle_selector, filestyle_opts, (e) => { filestyle_val = e })
 
     const dub_l = gen("label")
         .attr("class", "is-size-7")
@@ -144,7 +146,7 @@ function modal_loader(index, title, url) {
     const footer = gen("footer")
     let download_btn = gen("a")
         .attr("href", "#")
-        .attr("id", `download_btn${index}`)
+        .attr("id", `download_btn${unique_id[1]}`)
         .attr("class", "button is-primary is-dark")
         .inner("generate")
 

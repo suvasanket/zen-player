@@ -1,5 +1,5 @@
 import { grid_loader, gen } from "./thumbnails.js"
-const api_base = 'https://pipedapi.kavin.rocks/'
+const piped_api = 'https://pipedapi.kavin.rocks/'
 
 let NextPageUrl = "";
 let IfLessThan20Res = true
@@ -73,10 +73,10 @@ function spiner_stop() {
 }
 
 async function piped_fetch(query, nextPageUrl, filter = "videos") {
-    let url = query == null ? `${api_base}trending?region=IN` : `${api_base}search?q=${query}&filter=${filter}`
+    let url = query == null ? `${piped_api}trending?region=IN` : `${piped_api}search?q=${query}&filter=${filter}`
 
     if (nextPageUrl !== undefined) {
-        url = `${api_base}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
+        url = `${piped_api}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
     }
     else {
         spiner_start()
@@ -85,7 +85,7 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
         const response = await fetch(url);
         const data = await response.json();
         if(document.querySelector("#spiner")) spiner_stop()
-        //console.log(data.items.length)
+        //console.log(data)
 
         if (data.items) {
             data.items.forEach((e, index) => grid_loader(e, index))
