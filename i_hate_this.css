@@ -34,7 +34,7 @@
     position: relative;
 }
 .duration {
-    font-size: 1px;
+    font-size: 10px;
     position: absolute;
     bottom: 5px;
     right: 5px;

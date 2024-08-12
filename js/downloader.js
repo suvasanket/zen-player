@@ -1,15 +1,7 @@
-import { gen } from './thumbnails.js'
-const yt_domain = "https://www.youtube.com"
-const cobalt_api = "https://api.cobalt.tools/api/json"
+import { gen, yt_domain, cobalt_api } from './helper.js'
 
 async function Cobalt(vurl, audio, quality, codec, filestyle, dub) {
     const url = yt_domain + vurl
-    //console.log(vurl)
-    //console.log(audio)
-    //console.log(quality)
-    //console.log(codec)
-    //console.log(filestyle)
-    //console.log(dub)
 
     try {
         const fetched = await fetch(cobalt_api, {
@@ -32,7 +24,6 @@ async function Cobalt(vurl, audio, quality, codec, filestyle, dub) {
         })
         const data = await fetched.json()
         if (data.url) {
-            //console.log(data.url)
             return data.url
         }
     }
@@ -61,14 +52,14 @@ function option_generator(unique_id, parent, opts, callback) {
         a.appendChild(span);
         li.appendChild(a);
 
-        // Make the first tab active by default
+        // first button by-default active
         if (index === 0) {
             li.classList.add('is-active');
         }
 
         parent.appendChild(li);
 
-        // Add click event to handle active state
+        // click to active
         li.addEventListener('click', function() {
             parent.querySelector('li.is-active').classList.remove('is-active');
             this.classList.add('is-active');
@@ -85,7 +76,7 @@ function download_btn_refresh(link, inner, download_btn) {
 }
 
 
-function modal_loader(title, url) {
+export function modal_loader(title, url) {
     const downloader_modals = document.createDocumentFragment()
     const unique_id = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:\?|&|$)/) //[v=asdas, asdas]
 
@@ -215,5 +206,3 @@ function modal_loader(title, url) {
         }
     })
 }
-
-export { modal_loader }

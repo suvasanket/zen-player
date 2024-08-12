@@ -1,21 +1,8 @@
 import { modal_loader } from "./downloader.js"
+import { gen, getTheme, yt_domain, piped_domain } from "./helper.js"
 
-const piped_domain = 'https://piped.video'
-const yt_domain = "https://www.youtube.com"
 let video_opt = '&playerAutoPlay=true'
-
-const gen = (tag) => {
-    let element = document.createElement(tag)
-    element.attr = function(attr, val) {
-        this.setAttribute(attr, val)
-        return this
-    }
-    element.inner = function(val) {
-        this.innerHTML = val
-        return this
-    }
-    return element
-}
+video_opt += `&theme=${getTheme()}`
 
 const quality = ['144', '240', '360', '720']
 quality.push('Download')
@@ -37,6 +24,9 @@ function timeFormat(sec) {
     var hDisplay = h > 0 ? (h < 10 ? "0" + h + ":" : h + ":") : "";
     var mDisplay = m > 0 ? (m < 10 ? "0" + m + ":" : m + ":") : "";
     var sDisplay = s >= 0 ? (s < 10 ? "0" + s : s) : "";
+
+    if (mDisplay === "" && sDisplay !== "") return "0:" + sDisplay
+
     return hDisplay + mDisplay + sDisplay;
 }
 
@@ -59,16 +49,8 @@ function views_format(views) {
     }
 }
 
-//light mode
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-    video_opt += '&theme=light'
-}
-else {
-    video_opt += '&theme=dark'
-}
-
 // it takes each element and then append them to the main columns
-function grid_loader(e, index) {
+export function grid_loader(e) {
     const type = e.type
 
     const cell = gen("div")
@@ -140,7 +122,7 @@ function grid_loader(e, index) {
         }
 
         const channel_logo = gen("img")
-            .attr("style", "height: 24; width: 24px; margin-right: 7px;")
+            .attr("style", "height: 24px; width: 24px; margin-right: 7px;")
         channel_logo.src = e.uploaderAvatar
         channel_logo.alt = e.uploaderName
 
@@ -205,6 +187,3 @@ function grid_loader(e, index) {
 
     columns.appendChild(cell);
 }
-
-
-export { grid_loader, gen }

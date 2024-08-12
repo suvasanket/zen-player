@@ -1,5 +1,5 @@
-import { grid_loader, gen } from "./thumbnails.js"
-const piped_api = 'https://pipedapi.kavin.rocks/'
+import { grid_loader } from "./thumbnails.js"
+import { gen, piped_api, getTheme } from "./helper.js"
 
 let NextPageUrl = "";
 let IfLessThan20Res = true
@@ -58,13 +58,14 @@ inputForm.addEventListener("submit", e => {
 })
 
 function spiner_start() {
+    const spiner_fg = getTheme() === "dark" ? "white" : "black"
     const spin_container = gen("div")
         .attr("class", "container is-flex is-justify-content-center is-align-items-center")
         .attr("id", "spiner")
         .attr("style", "height: 200px;")
     const spin_button = gen("button")
-        .attr("class", "button is-large is-link is-loading ")
-        .attr("style", "border: none; background: transparent; box-shadow: none;")
+        .attr("class", "button is-large is-loading ")
+        .attr("style", `border: none; background: transparent; box-shadow: none; color: ${spiner_fg}`)
     spin_container.appendChild(spin_button)
     container.prepend(spin_container)
 }
@@ -103,8 +104,9 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
         NextPageUrl = data.nextpage;
         if (NextPageUrl) {
             // if less than 20 results then do a nextpage reload
-            const len = data.items.length || data.length;
-            if (len - 1 < 20 && len !== 0 && IfLessThan20Res) {
+            const len = data.length || data.items.length
+            console.log(len)
+            if (len < 20 && len !== 0 && IfLessThan20Res) {
                 piped_fetch(query, NextPageUrl)
                 IfLessThan20Res = false
             }
