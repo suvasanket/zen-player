@@ -2,7 +2,7 @@ import { grid_loader } from "./thumbnails.js"
 import { gen, piped_api, getTheme } from "./helper.js"
 
 let NextPageUrl = "";
-let IfLessThan20Res = true
+let totalNumberOfVideos = []
 
 const columns = document.querySelector("#columns");
 const container = document.querySelector("#container");
@@ -47,7 +47,7 @@ inputForm.addEventListener("submit", e => {
         newURL.searchParams.set('q', val);
         history.pushState({}, '', newURL)
 
-        IfLessThan20Res = true
+        totalNumberOfVideos = []
     } else {
         columns.innerHTML = ""
         newURL.searchParams.delete('q');
@@ -58,19 +58,23 @@ inputForm.addEventListener("submit", e => {
 })
 
 function spiner_start() {
-    const spiner_fg = getTheme() === "dark" ? "white" : "black"
-    const spin_container = gen("div")
-        .attr("class", "container is-flex is-justify-content-center is-align-items-center")
-        .attr("id", "spiner")
-        .attr("style", "height: 200px;")
-    const spin_button = gen("button")
-        .attr("class", "button is-large is-loading ")
-        .attr("style", `border: none; background: transparent; box-shadow: none; color: ${spiner_fg}`)
-    spin_container.appendChild(spin_button)
-    container.prepend(spin_container)
+    if (!document.getElementById("spiner")) {
+        const spiner_fg = getTheme() === "dark" ? "white" : "black"
+        const spin_container = gen("div")
+            .attr("class", "container is-flex is-justify-content-center is-align-items-center")
+            .attr("id", "spiner")
+            .attr("style", "height: 200px;")
+        const spin_button = gen("button")
+            .attr("class", "button is-large is-loading ")
+            .attr("style", `border: none; background: transparent; box-shadow: none; color: ${spiner_fg}`)
+        spin_container.appendChild(spin_button)
+        container.prepend(spin_container)
+    }
 }
 function spiner_stop() {
-    document.querySelector("#spiner").remove()
+    if (document.getElementById("spiner")) {
+        document.querySelector("#spiner").remove()
+    }
 }
 
 async function piped_fetch(query, nextPageUrl, filter = "videos") {
@@ -85,7 +89,7 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
     try {
         const response = await fetch(url);
         const data = await response.json();
-        if(document.querySelector("#spiner")) spiner_stop()
+        if (document.querySelector("#spiner")) spiner_stop()
         //console.log(data)
 
         if (data.items) {
@@ -104,11 +108,11 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
         NextPageUrl = data.nextpage;
         if (NextPageUrl) {
             // if less than 20 results then do a nextpage reload
-            const len = data.length || data.items.length
-            console.log(len)
-            if (len < 20 && len !== 0 && IfLessThan20Res) {
+            const total = totalNumberOfVideos.reduce((prev, cur) => prev + cur, 0)
+            if (total < 30) {
                 piped_fetch(query, NextPageUrl)
-                IfLessThan20Res = false
+                const len = data.items.length || data.length
+                totalNumberOfVideos.push(len)
             }
             window.addEventListener('scroll', function() {
                 const scrollPosition = window.innerHeight + window.scrollY;
