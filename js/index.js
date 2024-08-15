@@ -1,5 +1,11 @@
 import { grid_loader } from "./thumbnails.js"
-import { gen, piped_api, getTheme } from "./helper.js"
+import {
+    gen,
+    piped_api,
+    getTheme,
+    modal_detector_loader,
+    notification_detector_loader,
+} from "./helper.js"
 
 let NextPageUrl = "";
 let totalNumberOfVideos = []
@@ -132,47 +138,8 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
     }
 }
 
-const modal_detector_loader = () => {
-    function openModal($el) {
-        document.querySelector("HTML").classList.add('is-clipped');
-        $el.classList.add('is-active');
-    }
-
-    function closeModal($el) {
-        document.querySelector("HTML").classList.remove('is-clipped');
-        $el.classList.remove('is-active');
-    }
-
-    function closeAllModals() {
-        (document.querySelectorAll('.modal') || []).forEach(($modal) => {
-            closeModal($modal);
-        });
-    }
-
-    // Add a click event on buttons to open a specific modal
-    (document.querySelectorAll('.downloader-trigger') || []).forEach(($trigger) => {
-        const modal = $trigger.dataset.target;
-        const $target = document.getElementById(modal);
-
-        $trigger.addEventListener('click', () => {
-            openModal($target);
-        });
-    });
-
-    // Add a click event on various child elements to close the parent modal
-    (document.querySelectorAll('.modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button') || []).forEach(($close) => {
-        const $target = $close.closest('.modal');
-
-        $close.addEventListener('click', () => {
-            closeModal($target);
-        });
-    });
-
-    // Add a keyboard event to close all modals
-    document.addEventListener('keydown', (event) => {
-        if (event.key === "Escape") {
-            closeAllModals();
-        }
-    });
-}
-document.addEventListener('DOMContentLoaded', modal_detector_loader())
+// load some loader
+document.addEventListener('DOMContentLoaded', () => {
+    modal_detector_loader()
+    notification_detector_loader()
+})

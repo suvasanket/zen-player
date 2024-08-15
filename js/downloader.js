@@ -1,4 +1,4 @@
-import { gen, yt_domain, cobalt_api } from './helper.js'
+import { gen, yt_domain, cobalt_api, notification, getTheme } from './helper.js'
 
 async function Cobalt(vurl, audio, quality, codec, filestyle, dub) {
     const url = yt_domain + vurl
@@ -23,9 +23,9 @@ async function Cobalt(vurl, audio, quality, codec, filestyle, dub) {
 
         })
         const data = await fetched.json()
-        if (data.url) {
-            return data.url
-        }
+
+        if (data)
+            return data
     }
     catch (err) {
         console.log(err);
@@ -70,8 +70,13 @@ function option_generator(unique_id, parent, opts, callback) {
 }
 
 function download_btn_refresh(link, inner, download_btn) {
+    if (link === "#") {
+        download_btn.removeAttribute('href')
+    }
+    else {
+        download_btn.href = link;
+    }
     download_btn.className = "button is-primary is-dark"
-    download_btn.href = link;
     download_btn.innerText = inner;
 }
 
@@ -136,7 +141,6 @@ export function modal_loader(title, url) {
 
     const footer = gen("footer")
     let download_btn = gen("a")
-        .attr("href", "#")
         .attr("id", `download_btn${unique_id[1]}`)
         .attr("class", "button is-primary is-dark")
         .inner("generate")
@@ -192,9 +196,14 @@ export function modal_loader(title, url) {
             if(quality_val === "4K") quality_val = 2160
             if(quality_val === "8K+") quality_val = max
 
-            const cobaltLink = await Cobalt(url, audio_val, quality_val, codec_val, filestyle_val, dub_val);
-
-            download_btn_refresh(cobaltLink, "Download", download_btn);
+            const response = await Cobalt(url, audio_val, quality_val, codec_val, filestyle_val, dub_val);
+            if (response.status === "error"){
+                notification(response.text,10000,`is-danger is-${getTheme()}`)
+                download_btn_refresh("#", "generate", download_btn);
+            }
+            else {
+                download_btn_refresh(response.url, "Download", download_btn);
+            }
         }
         if (b_text === "Download") {
             const modal = document.querySelectorAll('.modal') || [];
