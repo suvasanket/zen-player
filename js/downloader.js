@@ -1,6 +1,6 @@
 import { gen, yt_domain, cobalt_api, notification, getTheme } from './helper.js'
 
-async function Cobalt(vurl, audio, quality, codec, filestyle, dub) {
+async function Cobalt(vurl, audio, quality, codec, filestyle, dub, metadata) {
     const url = yt_domain + vurl
 
     try {
@@ -17,8 +17,8 @@ async function Cobalt(vurl, audio, quality, codec, filestyle, dub) {
                 vCodec: codec,
                 filenamePattern: filestyle,
                 isAudioOnly: audio,
-                disableMetadata: true,
                 dubLang: dub,
+                disableMetadata: metadata,
             }),
 
         })
@@ -42,6 +42,7 @@ let quality_val = '144'
 let codec_val = 'h264'
 let filestyle_val = 'basic'
 let dub_val = false
+let metadata_val = false
 
 function option_generator(unique_id, parent, opts, callback) {
     opts.forEach((opt, index) => {
@@ -135,8 +136,20 @@ export function modal_loader(title, url) {
         .inner(` Dub-Audio (Browser language)`)
     const dub_selector = gen("input").attr("type", "checkbox")
     dub_l.prepend(dub_selector)
-    const dub = gen("div").attr("class", "card p-3").attr("style", "display: inline-block; width: auto; max - width: 100 %; ")
+    const dub = gen("div")
+        .attr("class", "card p-2 mb-1")
+        .attr("style", "display: inline-block; width: auto; max - width: 100 %; position: relative")
     dub.appendChild(dub_l)
+
+    const metadata_l = gen("label")
+        .attr("class", "is-size-7")
+        .inner(` Disable metadata`)
+    const metadata_selector = gen("input").attr("type", "checkbox")
+    metadata_l.prepend(metadata_selector)
+    const metadata = gen("div")
+        .attr("class", "card p-2 mt-0")
+        .attr("style", "display: inline-block; width: auto; max - width: 100 %; ")
+    metadata.appendChild(metadata_l)
     //opts
 
     const footer = gen("footer")
@@ -166,6 +179,8 @@ export function modal_loader(title, url) {
     box.appendChild(filestyle_subtitle)
     box.appendChild(filestyle)
     box.appendChild(dub)
+    box.appendChild(document.createElement("div"))
+    box.appendChild(metadata)
 
     box.appendChild(footer)
 
@@ -178,11 +193,21 @@ export function modal_loader(title, url) {
     document.body.appendChild(downloader_modals)
 
     dub_selector.addEventListener('change', () => {
+        download_btn_refresh("#", "generate", download_btn);
         if (dub_selector.checked) {
             dub_val = true
         }
         else {
             dub_val = false
+        }
+    })
+    metadata_selector.addEventListener('change', () => {
+        download_btn_refresh("#", "generate", download_btn);
+        if (metadata_selector.checked) {
+            metadata_val = true
+        }
+        else {
+            metadata_val = false
         }
     })
 

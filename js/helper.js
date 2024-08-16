@@ -80,7 +80,7 @@ export function gen(tag) {
 }
 
 export function notification(content, duration, Class) {
-    const notification = gen("div").attr("class", "notification " + Class)
+    const notification = gen("div").attr("class", "notification is-family-monospace " + Class)
     const botton = gen("button").attr("class", "delete")
     notification.appendChild(botton)
     notification.appendChild(document.createTextNode(content))

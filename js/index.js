@@ -60,7 +60,6 @@ inputForm.addEventListener("submit", e => {
         history.pushState({}, '', newURL)
         piped_fetch(null)
     }
-    window.location.reload()
 })
 
 function spiner_start() {
