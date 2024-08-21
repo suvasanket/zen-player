@@ -1,5 +1,11 @@
+const individous_instance = {
+    yewtube: "https://yewtu.be",
+    ggtyler: "https://iv.ggtyler.dev",
+    perennialte: "https://invidious.perennialte.ch",
+}
 export const yt_domain = "https://www.youtube.com"
 export const piped_domain = 'https://piped.video'
+export const invidious_domain = individous_instance.perennialte
 
 export const cobalt_api = "https://api.cobalt.tools/api/json"
 export const piped_api = 'https://pipedapi.kavin.rocks/'
@@ -82,8 +88,10 @@ export function gen(tag) {
 export function notification(content, duration, Class) {
     const notification = gen("div").attr("class", "notification is-family-monospace " + Class)
     const botton = gen("button").attr("class", "delete")
+    const cont = gen("p")
+    cont.innerHTML = content
     notification.appendChild(botton)
-    notification.appendChild(document.createTextNode(content))
+    notification.appendChild(cont)
 
     notification.style.position = 'fixed'
     notification.style.top = '10px'

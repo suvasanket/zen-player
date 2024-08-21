@@ -1,8 +1,8 @@
 import { modal_loader } from "./downloader.js"
-import { gen, getTheme, yt_domain, piped_domain } from "./helper.js"
+import { gen, getTheme, yt_domain, piped_domain, invidious_domain } from "./helper.js"
 
-let video_opt = '&playerAutoPlay=true'
-video_opt += `&theme=${getTheme()}`
+let video_opt = '&autoplay=1'
+video_opt += `&dark_mode=auto`
 
 const quality = ['144', '240', '360', '720']
 quality.push('Download')
@@ -100,7 +100,7 @@ export function grid_loader(e) {
         }
 
         // heuristic site opener
-        let v_url = piped_domain + e.url + video_opt
+        let v_url = invidious_domain + e.url + video_opt
         if (e.duration === -1) {
             v_url = yt_domain + e.url
         }
@@ -140,7 +140,7 @@ export function grid_loader(e) {
                 a.innerHTML = el
                 modal_loader(e.title, e.url)
             } else {
-                a.setAttribute("href", v_url + "&quality=" + el)
+                a.setAttribute("href", v_url + "&quality_dash=" + el)
                 a.innerHTML = el + "p"
             }
             corner_content.appendChild(a)
