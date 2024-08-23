@@ -15,7 +15,11 @@ const container = document.querySelector("#container");
 const inputField = document.querySelector("#input")
 const inputForm = document.querySelector("#inputForm")
 const selectField = document.querySelector("#select")
+const header_logo = document.querySelector("#header-logo")
 let isAtBottom = false;
+
+//
+header_logo.src = `./assets/logo${Math.floor(Math.random() * 6)}.png`
 
 // Get the query parameter
 const urlParams = new URLSearchParams(window.location.search);
@@ -46,9 +50,10 @@ inputForm.addEventListener("submit", e => {
 
     if (inputField.value !== "") {
         const val = inputField.value
-        const sel = selectField.value
+        //const sel = selectField.value
         columns.innerHTML = ""
-        piped_fetch(val, undefined, sel)
+        //piped_fetch(val, undefined, sel)
+        piped_fetch(val, undefined)
 
         newURL.searchParams.set('q', val);
         history.pushState({}, '', newURL)

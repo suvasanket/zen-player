@@ -1,12 +1,14 @@
-/*:root {*/
-/*    overflow: initial;*/
-/*}*/
+:root {
+    --bulma-link-h: 276deg;
+    --bulma-link-s: 0%;
+    --bulma-link-l: 21%;
+}
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
+    padding: 20px 20px 0px 20px;
 }
 .logo {
     display: flex;
@@ -14,11 +16,11 @@
 }
 .logo img {
     max-height: 40px;
-    margin-right: -5px;
+    margin-right: -20px;
 }
 .logo .title {
     margin-bottom: 0;
-    transform: translateY(2px);
+    transform: translateY(6px);
 }
 .spacer {
     flex: 1;

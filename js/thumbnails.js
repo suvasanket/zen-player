@@ -1,10 +1,15 @@
 import { modal_loader } from "./downloader.js"
-import { gen, getTheme, yt_domain, piped_domain, invidious_domain } from "./helper.js"
+import {
+    gen,
+    yt_domain,
+    piped_domain,
+    invidious_domain,
+} from "./helper.js"
 
 let video_opt = '&autoplay=1'
 video_opt += `&dark_mode=auto`
 
-const quality = ['144', '240', '360', '720']
+const quality = ['lowest', 'highest']
 quality.push('Download')
 
 function stringLimit(str, maxLength = 10) {
@@ -100,11 +105,13 @@ export function grid_loader(e) {
         }
 
         // heuristic site opener
-        let v_url = invidious_domain + e.url + video_opt
+        //let v_url = invidious_domain + e.url + video_opt
+        let some = e.url
+        let v_url = some.replace(/^\/watch\?(v=.*)$/, '/watch/?$1');
         if (e.duration === -1) {
             v_url = yt_domain + e.url
         }
-        video_opener.setAttribute("href", v_url);
+        video_opener.setAttribute("href", v_url + 0);
 
         const channel_opener = gen("a")
             .attr("style", "display: flex; align-items: center; margin-right: 7px;")
@@ -139,9 +146,14 @@ export function grid_loader(e) {
                 a.setAttribute("data-target", "downloader-modal" + unique_id[1])
                 a.innerHTML = el
                 modal_loader(e.title, e.url)
-            } else {
-                a.setAttribute("href", v_url + "&quality_dash=" + el)
-                a.innerHTML = el + "p"
+            }
+            else if (el === 'lowest') {
+                a.setAttribute("href", v_url + 1)
+                a.innerHTML = el
+            }
+            else if (el === 'highest') {
+                a.setAttribute("href", v_url + 2)
+                a.innerHTML = el
             }
             corner_content.appendChild(a)
         })

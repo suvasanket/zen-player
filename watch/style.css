@@ -1,8 +1,58 @@
-.video-js {
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.video-box {
+  width: 100%;
+  max-width: 100%;
+  height: 80vh;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.video-container .video-js {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 80%;
-  margin-top: 50px;
+  height: 100%;
+  border-radius: 8px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 0px 20px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+}
+.logo img {
+  max-height: 40px;
+  margin-right: -5px;
+}
+.logo .title {
+  margin-bottom: 0;
+  transform: translateY(2px);
+}
+.spacer {
+  flex: 1;
+}
+.search-bar {
+  flex: 0 0 auto;
+  width: 500px;
+}
+.search-bar input {
+  width: 100%;
 }

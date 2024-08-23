@@ -3,25 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css"
-    />
-    <title>piped</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css"/>
     <link rel="stylesheet" href="./i_hate_this.css" />
-    <link rel="icon" href="./assets/logo.svg" />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
+    <link rel="manifest" href="favicons/site.webmanifest">
+
+    <title>zen-player</title>
   </head>
   <body>
     <header class="header">
       <a class="logo">
-        <img src="./assets/logo.svg" alt="put your cursor away creep" />
-        <span class="title">iped</span>
+        <img src="./assets/logo0.png" id="header-logo"/>
+        <span class="title">zen</span>
       </a>
-      <div class="spacer"></div>
       <div class="search-bar">
         <form id="inputForm">
           <input
-            class="input is-rounded"
+            class="input is-rounded ml-5"
             type="text"
             placeholder="Search 'cat videos' + Enter"
             id="input"
@@ -29,16 +30,16 @@
         </form>
       </div>
       <div class="spacer"></div>
-      <div id="selector" class="select is-rounded ml-2">
-        <select class="is-hovered" id="select">
-          <option value="videos">videos</option>
-          <option value="playlists">playlists</option>
-          <option value="music_songs">music_songs</option>
-          <option value="music_videos">music_videos</option>
-          <option value="music_playlists">music_playlists</option>
-        </select>
-        <div class="spacer"></div>
-      </div>
+      <!--<div id="selector" class="select is-rounded ml-2">-->
+      <!--  <select class="is-hovered" id="select">-->
+      <!--    <option value="videos">videos</option>-->
+      <!--    <option value="playlists">playlists</option>-->
+      <!--    <option value="music_songs">music_songs</option>-->
+      <!--    <option value="music_videos">music_videos</option>-->
+      <!--    <option value="music_playlists">music_playlists</option>-->
+      <!--  </select>-->
+      <!--  <div class="spacer"></div>-->
+      <!--</div>-->
     </header>
     <div class="m-4" id="container">
       <div class="fixed-grid has-5-cols" id="fixed-grid">

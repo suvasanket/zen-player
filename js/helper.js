@@ -1,11 +1,11 @@
-const individous_instance = {
-    yewtube: "https://yewtu.be",
-    ggtyler: "https://iv.ggtyler.dev",
-    perennialte: "https://invidious.perennialte.ch",
-}
+const individous_instance = [
+    "https://yewtu.be",
+    "https://iv.ggtyler.dev",
+    "https://invidious.perennialte.ch",
+]
 export const yt_domain = "https://www.youtube.com"
 export const piped_domain = 'https://piped.video'
-export const invidious_domain = individous_instance.perennialte
+export const invidious_domain = individous_instance[0]
 
 export const cobalt_api = "https://api.cobalt.tools/api/json"
 export const piped_api = 'https://pipedapi.kavin.rocks/'

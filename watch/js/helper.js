@@ -46,11 +46,3 @@ export function qualityExtract(arr, def, dash) {
     })
     return res
 }
-
-export function changeApi(api, counter) {
-    if (counter !== 0) {
-        api.push(api.shift())
-    }
-    counter--
-    return { api, counter }
-}

@@ -9,6 +9,7 @@
 
   <!-- Video.js CSS -->
   <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet" />
+  <link href="https://unpkg.com/@videojs/themes@1/dist/forest/index.css" rel="stylesheet">
   <!--/quality-selector/-->
   <link href="https://unpkg.com/@silvermine/videojs-quality-selector/dist/css/quality-selector.css" rel="stylesheet">
   <!-- Video.js JavaScript -->
@@ -22,10 +23,58 @@
 </head>
 
 <body>
-    <video id="video-player" class="video-js vjs-theme-fantasy" preload="auto" controls>
-    </video>
+  <header class="header">
+    <a class="logo">
+      <img src="./assets/logo.svg" alt="put your cursor away creep" />
+      <span class="title">iped</span>
+    </a>
+    <div class="spacer"></div>
+    <div class="search-bar">
+      <form id="inputForm">
+        <input
+            class="input is-rounded"
+            type="text"
+            placeholder="Search 'cat videos' + Enter"
+            id="input"
+            />
+      </form>
+    </div>
+    <div class="spacer"></div>
+    <div id="selector" class="select is-rounded ml-2">
+      <select class="is-hovered" id="select">
+        <option value="videos">videos</option>
+        <option value="playlists">playlists</option>
+        <option value="music_songs">music_songs</option>
+        <option value="music_videos">music_videos</option>
+        <option value="music_playlists">music_playlists</option>
+      </select>
+      <div class="spacer"></div>
+    </div>
+  </header>
+
+  <div class="m-4">
+    <div class="box video-box">
+      <div class="video-container">
+        <video
+          id="video-player"
+          class="video-js vjs-theme-forest"
+          preload="auto"
+          controls
+        >
+        </video>
+
+        <p class="vjs-no-js">
+        To view this video please enable JavaScript, and consider upgrading to a
+        web browser that
+        <a href="https://videojs.com/html5-video-support/" target="_blank">
+          supports HTML5 video
+        </a>
+        </p>
+      </div>
+    </div>
 
     <script src="js/index.js" type="module"></script>
     <script src="js/helper.js" type="module"></script>
+  </div>
 </body>
 </html>
