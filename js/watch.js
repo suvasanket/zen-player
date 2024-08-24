@@ -1,8 +1,12 @@
+import { HeaderGenerator } from "./common.js"
 import {
     video_audioSeparator,
     webm_mp4Separator,
     qualityExtract,
-} from "./helper.js"
+} from "./watch_helper.js"
+
+// generate header
+HeaderGenerator()
 
 const video = videojs('video-player')
 video.controlBar.addChild('QualitySelector')
@@ -84,7 +88,7 @@ async function videoFetch(vid, api, default_quality) {
         try {
             const fetched = await fetch(api[currentIndex] + video_param + vid)
             const data = await fetched.json()
-            console.log(data)
+            //console.log(data)
 
             try {
                 PlayVideo(data.adaptiveFormats, data.formatStreams, default_quality)

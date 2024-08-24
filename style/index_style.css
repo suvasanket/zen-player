@@ -4,34 +4,6 @@
     --bulma-link-l: 21%;
 }
 
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 20px 0px 20px;
-}
-.logo {
-    display: flex;
-    align-items: center;
-}
-.logo img {
-    max-height: 40px;
-    margin-right: -20px;
-}
-.logo .title {
-    margin-bottom: 0;
-    transform: translateY(6px);
-}
-.spacer {
-    flex: 1;
-}
-.search-bar {
-    flex: 0 0 auto;
-    width: 500px; /* Adjust this width as needed */
-}
-.search-bar input {
-    width: 100%;
-}
 .card-image {
     position: relative;
 }

@@ -10,48 +10,23 @@
   <!-- Video.js CSS -->
   <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet" />
   <link href="https://unpkg.com/@videojs/themes@1/dist/forest/index.css" rel="stylesheet">
-  <!--/quality-selector/-->
   <link href="https://unpkg.com/@silvermine/videojs-quality-selector/dist/css/quality-selector.css" rel="stylesheet">
-  <!-- Video.js JavaScript -->
+
   <script src="https://vjs.zencdn.net/7.17.0/video.min.js"></script>
   <script src="https://unpkg.com/@silvermine/videojs-quality-selector/dist/js/silvermine-videojs-quality-selector.min.js"></script>
-  <!-- VHS Plugin -->
-  <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-http-streaming/2.15.0/videojs-http-streaming.min.js"></script>-->
 
-  <title>Piped</title>
-  <link rel="stylesheet" href="./style.css">
+  <!--favicon-->
+  <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
+  <link rel="manifest" href="favicons/site.webmanifest">
+
+  <link rel="stylesheet" href="style/header.css" />
+  <link rel="stylesheet" href="style/watch_style.css"/>
+  <title>zen-player</title>
 </head>
 
 <body>
-  <header class="header">
-    <a class="logo">
-      <img src="./assets/logo.svg" alt="put your cursor away creep" />
-      <span class="title">iped</span>
-    </a>
-    <div class="spacer"></div>
-    <div class="search-bar">
-      <form id="inputForm">
-        <input
-            class="input is-rounded"
-            type="text"
-            placeholder="Search 'cat videos' + Enter"
-            id="input"
-            />
-      </form>
-    </div>
-    <div class="spacer"></div>
-    <div id="selector" class="select is-rounded ml-2">
-      <select class="is-hovered" id="select">
-        <option value="videos">videos</option>
-        <option value="playlists">playlists</option>
-        <option value="music_songs">music_songs</option>
-        <option value="music_videos">music_videos</option>
-        <option value="music_playlists">music_playlists</option>
-      </select>
-      <div class="spacer"></div>
-    </div>
-  </header>
-
   <div class="m-4">
     <div class="box video-box">
       <div class="video-container">
@@ -73,8 +48,9 @@
       </div>
     </div>
 
-    <script src="js/index.js" type="module"></script>
-    <script src="js/helper.js" type="module"></script>
+    <script src="js/common.js" type="module"></script>
+    <script src="js/watch.js" type="module"></script>
+    <script src="js/watch_helper.js" type="module"></script>
   </div>
 </body>
 </html>

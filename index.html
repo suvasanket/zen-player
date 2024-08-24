@@ -3,109 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--bulma-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css"/>
-    <link rel="stylesheet" href="./i_hate_this.css" />
 
+    <!--favicon-->
     <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
     <link rel="manifest" href="favicons/site.webmanifest">
 
+    <link rel="stylesheet" href="style/header.css" />
+    <link rel="stylesheet" href="style/index_style.css" />
     <title>zen-player</title>
   </head>
   <body>
-    <header class="header">
-      <a class="logo">
-        <img src="./assets/logo0.png" id="header-logo"/>
-        <span class="title">zen</span>
-      </a>
-      <div class="search-bar">
-        <form id="inputForm">
-          <input
-            class="input is-rounded ml-5"
-            type="text"
-            placeholder="Search 'cat videos' + Enter"
-            id="input"
-          />
-        </form>
-      </div>
-      <div class="spacer"></div>
-      <!--<div id="selector" class="select is-rounded ml-2">-->
-      <!--  <select class="is-hovered" id="select">-->
-      <!--    <option value="videos">videos</option>-->
-      <!--    <option value="playlists">playlists</option>-->
-      <!--    <option value="music_songs">music_songs</option>-->
-      <!--    <option value="music_videos">music_videos</option>-->
-      <!--    <option value="music_playlists">music_playlists</option>-->
-      <!--  </select>-->
-      <!--  <div class="spacer"></div>-->
-      <!--</div>-->
-    </header>
     <div class="m-4" id="container">
       <div class="fixed-grid has-5-cols" id="fixed-grid">
         <div class="grid mt-4" id="columns">
-          <!--here all video cells-->
-          <!--<div class="cell">-->
-          <!--  <div class="card">-->
-          <!--    <div class="card-image">-->
-          <!--      <a href="#">-->
-          <!--        <figure class="image is-16by9">-->
-          <!--          <img src="https://bulma.io/assets/images/placeholders/1280x960.png" alt="Placeholder image"/>-->
-          <!--        </figure>-->
-          <!--      </a>-->
-          <!--      <div class="icon-container">-->
-          <!--        <img src="./assets/play-circle-svgrepo-com.svg" alt="Expand Icon" style="height: 24px; width: 24px;">-->
-          <!--        <div class="hover-content">-->
-          <!--          <a href="#">144</a>-->
-          <!--          <a href="#">1080</a>-->
-          <!--          <a class="downloader-trigger" data-target="downloader-modal">Download</a>-->
-          <!--        </div>-->
-          <!--      </div>-->
-          <!--      <div class="m-2 pb-2" style="display: flex; align-items: center;">-->
-          <!--        <a id="channel_logo" href="#" style="display: flex; align-items: center; margin-right: 7px;">-->
-          <!--          <img src="https://bulma.io/assets/images/placeholders/32x32.png" alt="Logo" style="height: 24px; width: 24px;"/>-->
-          <!--        </a>-->
-          <!--        <div style="line-height: 1;">-->
-          <!--          <span class="is-size-7 has-text-weight-bold">-->
-          <!--            Title asdo asdpa dasdppj-->
-          <!--          </span>-->
-          <!--          <br/>-->
-          <!--          <span class="is-size-7 has-text-weight-light" style="margin-bottom: 5px;">-->
-          <!--            Views • Upload time ago-->
-          <!--          </span>-->
-          <!--        </div>-->
-          <!--      </div>-->
-          <!--    </div>-->
-          <!--  </div>-->
-          <!--</div>-->
-          <!--here-->
         </div>
       </div>
     </div>
+    <script type="module" src="./js/common.js"></script>
     <script type="module" src="./js/helper.js"></script>
     <script type="module" src="./js/thumbnails.js"></script>
     <script type="module" src="./js/index.js"></script>
     <script type="module" src="./js/downloader.js"></script>
     <script type="module" src="./js/mobile.js"></script>
-
-    <!-- downloader modal -->
-    <!--<div id="downloader-modal" class="modal">-->
-    <!--  <div class="modal-background"></div>-->
-    <!--  <div class="modal-content m-3">-->
-    <!--    <div class="box">-->
-    <!--      <p class="title">Download</p>-->
-    <!--      <p>this is from dummy duh</p>-->
-    <!--      <div class="tabs is-toggle is-centered is-fullwidth mt-4 mb-4">-->
-    <!--        <ul id="tab-list"></ul>-->
-    <!--      </div>-->
-    <!--      <footer>-->
-    <!--        <button class="button is-link">ready</button>-->
-    <!--        <button class="button">cancel</button>-->
-    <!--      </footer>-->
-    <!--    </div>-->
-    <!--  </div>-->
-    <!--</div>-->
-    <!-- downloader modal -->
-
   </body>
 </html>

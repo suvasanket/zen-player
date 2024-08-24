@@ -28,31 +28,3 @@ html, body {
   height: 100%;
   border-radius: 8px;
 }
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 20px 0px 20px;
-}
-.logo {
-  display: flex;
-  align-items: center;
-}
-.logo img {
-  max-height: 40px;
-  margin-right: -5px;
-}
-.logo .title {
-  margin-bottom: 0;
-  transform: translateY(2px);
-}
-.spacer {
-  flex: 1;
-}
-.search-bar {
-  flex: 0 0 auto;
-  width: 500px;
-}
-.search-bar input {
-  width: 100%;
-}
