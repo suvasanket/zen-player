@@ -1,56 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!--/bulma/-->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css"/>
+    <!--/bulma/-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css"/>
 
-  <!-- Video.js CSS -->
-  <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet" />
-  <link href="https://unpkg.com/@videojs/themes@1/dist/forest/index.css" rel="stylesheet">
-  <link href="https://unpkg.com/@silvermine/videojs-quality-selector/dist/css/quality-selector.css" rel="stylesheet">
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet" />
+    <link href="https://unpkg.com/@videojs/themes@1/dist/forest/index.css" rel="stylesheet">
+    <link href="https://unpkg.com/@silvermine/videojs-quality-selector/dist/css/quality-selector.css" rel="stylesheet">
 
-  <script src="https://vjs.zencdn.net/7.17.0/video.min.js"></script>
-  <script src="https://unpkg.com/@silvermine/videojs-quality-selector/dist/js/silvermine-videojs-quality-selector.min.js"></script>
+    <script src="https://vjs.zencdn.net/7.17.0/video.min.js"></script>
+    <script src="https://unpkg.com/@silvermine/videojs-quality-selector/dist/js/silvermine-videojs-quality-selector.min.js"></script>
 
-  <!--favicon-->
-  <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
-  <link rel="manifest" href="favicons/site.webmanifest">
+    <!--favicon-->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
+    <link rel="manifest" href="favicons/site.webmanifest">
 
-  <link rel="stylesheet" href="style/header.css" />
-  <link rel="stylesheet" href="style/watch_style.css"/>
-  <title>zen-player</title>
-</head>
+    <link rel="stylesheet" href="style/header.css" />
+    <link rel="stylesheet" href="style/watch_style.css"/>
+    <title>zen-player</title>
+  </head>
 
-<body>
-  <div class="m-4">
-    <div class="box video-box">
-      <div class="video-container">
-        <video
-          id="video-player"
-          class="video-js vjs-theme-forest"
-          preload="auto"
-          controls
-        >
-        </video>
-
-        <p class="vjs-no-js">
-        To view this video please enable JavaScript, and consider upgrading to a
-        web browser that
-        <a href="https://videojs.com/html5-video-support/" target="_blank">
-          supports HTML5 video
-        </a>
-        </p>
+  <body>
+    <div class="m-4">
+      <div class="box video-box">
+        <div class="video-container">
+          <video
+              id="video-player"
+              class="video-js vjs-theme-forest"
+              preload="auto"
+              controls
+              >
+          </video>
+            <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a
+            web browser that
+              <a href="https://videojs.com/html5-video-support/" target="_blank">
+                supports HTML5 video
+              </a>
+            </p>
+        </div>
       </div>
-    </div>
 
-    <script src="js/common.js" type="module"></script>
-    <script src="js/watch.js" type="module"></script>
-    <script src="js/watch_helper.js" type="module"></script>
-  </div>
-</body>
+      <script src="js/common.js" type="module"></script>
+      <script src="js/watch.js" type="module"></script>
+      <script src="js/watch_helper.js" type="module"></script>
+      <script src="js/Instances.js" type="module"></script>
+    </div>
+  </body>
 </html>

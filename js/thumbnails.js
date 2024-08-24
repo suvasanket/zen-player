@@ -264,7 +264,6 @@ export async function piped_fetch(query, nextPageUrl, filter = "videos") {
         if (NextPageUrl) {
             // if less than 20 results then do a nextpage reload
             const total = totalNumberOfVideos.reduce((prev, cur) => prev + cur, 0)
-            console.log(total)
             if (total < 30) {
                 piped_fetch(query, NextPageUrl)
                 const len = data.items.length || data.length

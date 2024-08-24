@@ -5,7 +5,7 @@ export function HeaderGenerator() {
     const header = gen("header").attr("class", "header")
     const logo = gen("a").attr("class", "logo")
     const header_logo = gen("img")
-        .attr("src", `./assets/logo${Math.floor(Math.random() * 6)}.png`)
+        .attr("src", `./assets/logo${Math.floor(Math.random() * 11)}.png`)
     header_logo.id = "header-logo"
     const title = gen("span").attr("class", "title")
     title.innerText = "zen"

@@ -4,6 +4,9 @@ import {
     modal_detector_loader,
     notification_detector_loader,
 } from "./helper.js"
+import { LoadApi } from "./Instances.js"
+
+LoadApi()
 
 // header load
 HeaderGenerator()

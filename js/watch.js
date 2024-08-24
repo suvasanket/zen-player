@@ -1,4 +1,5 @@
 import { HeaderGenerator } from "./common.js"
+import { GetApi } from "./Instances.js"
 import {
     video_audioSeparator,
     webm_mp4Separator,
@@ -8,13 +9,28 @@ import {
 // generate header
 HeaderGenerator()
 
-const video = videojs('video-player')
-video.controlBar.addChild('QualitySelector')
-const api = [
-    "https://invidious.perennialte.ch",
-    "https://yewtu.be",
-    "https://iv.ggtyler.dev",
-]
+// generate all endPoint
+const api = GetApi()
+
+const video = videojs('video-player', {
+    controlBar: {
+        children: [
+            "playToggle",
+            'skipBackward',
+            'skipForward',
+            'currentTimeDisplay',
+            'timeDivider',
+            'durationDisplay',
+            "progressControl",
+            "remainingTimeDisplay",
+            "volumePanel",
+            'pictureInPictureToggle',
+            'QualitySelector',
+            "fullscreenToggle"
+        ]
+    },
+})
+video.addClass('vjs-waiting')
 
 const UrlParams = new URLSearchParams(window.location.search)
 let id = UrlParams.get("v")
@@ -31,12 +47,19 @@ if (id) {
 }
 
 function PlayVideo(adaptiveFormats, formatStreams, default_quality) {
+    video.removeClass('vjs-waiting')
+
     const extractedFormats = video_audioSeparator(adaptiveFormats)
     const audio_arr = extractedFormats[0]
     const video_arr = extractedFormats[1]
 
     const webm_vid = webm_mp4Separator(video_arr)[0]
+    const mp4_vid = webm_mp4Separator(video_arr)[1]
     const webm_aud = webm_mp4Separator(audio_arr)[0]
+    const mp4_aud = webm_mp4Separator(audio_arr)[1]
+
+    const player_vid = webm_vid.length ? webm_vid : mp4_vid
+    const player_aud = webm_aud.length ? webm_aud : mp4_aud
 
     if (default_quality === 1)
         default_quality = video_arr[0].qualityLabel
@@ -45,9 +68,8 @@ function PlayVideo(adaptiveFormats, formatStreams, default_quality) {
     else
         default_quality = formatStreams[0].qualityLabel
 
-
-    let audio = new Audio(webm_aud[0].url)
-    const videoSrc = qualityExtract(webm_vid, default_quality)
+    let audio = new Audio(player_aud[0].url)
+    const videoSrc = qualityExtract(player_vid, default_quality)
     video.src(videoSrc)
 
     // video-audio sync
@@ -73,6 +95,7 @@ function PlayVideo(adaptiveFormats, formatStreams, default_quality) {
     video.on('seeking', () => audio.currentTime = video.currentTime())
     video.on('timeupdate', syncAudioVideo)
     video.on('loadstart', () => audio.pause())
+    video.on('volumechange', () => audio.volume = video.volume())
     video.on('playing', () => {
         audio.play()
         syncAudioVideo()
@@ -81,14 +104,18 @@ function PlayVideo(adaptiveFormats, formatStreams, default_quality) {
 }
 
 async function videoFetch(vid, api, default_quality) {
+    if (!api.length)
+        api = ["https://invidious.perennialte.ch"]
+
     const video_param = "/api/v1/videos/"
     let currentIndex = 0
 
     while (currentIndex < api.length) {
+        console.log(api[currentIndex])
         try {
             const fetched = await fetch(api[currentIndex] + video_param + vid)
             const data = await fetched.json()
-            //console.log(data)
+            console.log(data)
 
             try {
                 PlayVideo(data.adaptiveFormats, data.formatStreams, default_quality)
@@ -104,5 +131,6 @@ async function videoFetch(vid, api, default_quality) {
         }
     }
 
-    console.error("All available instance exhausted")
+    alert(`The probability is so low, it's barely on the chart.
+        Guess even luck decided to take a day off!`)
 }

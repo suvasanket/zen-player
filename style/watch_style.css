@@ -28,3 +28,7 @@ html, body {
   height: 100%;
   border-radius: 8px;
 }
+
+.vjs-waiting .vjs-big-play-button {
+  display: none;
+}
