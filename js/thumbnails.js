@@ -76,7 +76,7 @@ function grid_loader(e) {
         // heuristic site opener
         //let v_url = invidious_domain + e.url + video_opt
         let some = e.url
-        let v_url = some.replace(/^\/watch\?(v=.*)$/, '/watch.html?$1');
+        let v_url = some.replace(/^\/watch\?(v=.*)$/, 'watch.html?$1');
         if (e.duration === -1) {
             v_url = yt_domain + e.url
         }
