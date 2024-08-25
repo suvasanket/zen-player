@@ -15,6 +15,7 @@ import {
 
 let NextPageUrl = "";
 let totalNumberOfVideos = []
+const my_domain = "suvasanket.github.io"
 
 const columns = document.querySelector("#columns");
 const container = document.querySelector("#container");
@@ -74,9 +75,9 @@ function grid_loader(e) {
         }
 
         // heuristic site opener
-        //let v_url = invidious_domain + e.url + video_opt
-        let some = e.url
-        let v_url = some.replace(/^\/watch\?(v=.*)$/, 'watch.html?$1');
+        let v_url = e.url.replace(/\/watch/, 'watch.html');
+        if (window.location.hostname === my_domain)
+            v_url = e.url.replace(/\/watch/, 'zen-player/watch.html');
         if (e.duration === -1) {
             v_url = yt_domain + e.url
         }
