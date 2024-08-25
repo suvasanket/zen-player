@@ -1,4 +1,7 @@
-import { HeaderGenerator } from "./common.js"
+import {
+    HeaderGenerator,
+    views_format
+} from "./common.js"
 import { GetApi } from "./Instances.js"
 import {
     video_audioSeparator,
@@ -103,7 +106,45 @@ function PlayVideo(adaptiveFormats, formatStreams, default_quality) {
     video.on('qualitySelected', () => audio.currentTime = video.currentTime())
 }
 
+const removeSkele = (element) => element.classList.remove("has-skeleton")
+function BottomLayoutGen(data) {
+    const title = document.querySelector("#title")
+    removeSkele(title)
+    title.innerHTML = data.title
+
+    const views_time = document.querySelector("#views-timeago")
+    removeSkele(views_time)
+    views_time.innerHTML = views_format(data.viewCount) + " views • " + data.publishedText
+
+    const channel_logo_img = document.querySelector("#channel-logo-img")
+    removeSkele(channel_logo_img)
+    channel_logo_img.src = data.authorThumbnails[2].url
+
+    const channel_name = document.querySelector("#channel-name")
+    removeSkele(channel_name)
+    channel_name.innerHTML = data.author
+
+    const subs = document.querySelector("#subs")
+    removeSkele(subs)
+    subs.innerHTML = data.subCountText + " subscribers"
+
+    const description = document.querySelector("#description")
+    const formatted = data.description.replace(/\n/g, `<br>`)
+    description.insertAdjacentHTML('beforeend', formatted)
+
+    title.addEventListener("click", () => {
+        description.classList.toggle("is-open")
+    })
+    views_time.addEventListener("click", () => {
+        description.classList.toggle("is-open")
+    })
+}
+
 async function videoFetch(vid, api, default_quality) {
+    const ret = () => {
+        video.removeClass('vjs-waiting')
+        return
+    }
     if (!api.length)
         api = ["https://invidious.perennialte.ch"]
 
@@ -111,7 +152,6 @@ async function videoFetch(vid, api, default_quality) {
     let currentIndex = 0
 
     while (currentIndex < api.length) {
-        console.log(api[currentIndex])
         try {
             const fetched = await fetch(api[currentIndex] + video_param + vid)
             const data = await fetched.json()
@@ -119,12 +159,21 @@ async function videoFetch(vid, api, default_quality) {
 
             try {
                 PlayVideo(data.adaptiveFormats, data.formatStreams, default_quality)
-                return
+                ret()
             }
             catch (err) {
                 console.error("Error Playing Video: ", err)
-                return
+                ret()
             }
+            try {
+                BottomLayoutGen(data)
+                ret()
+            }
+            catch (err) {
+                console.error("Error Bottom Layout Generation: ", err)
+                ret()
+            }
+            return
         }
         catch (err) {
             currentIndex++

@@ -32,3 +32,18 @@ html, body {
 .vjs-waiting .vjs-big-play-button {
   display: none;
 }
+
+#title,#viwes {
+  margin: 0;
+  padding: 0;
+}
+
+.description-content {
+  display: none;
+}
+.description-content.is-open {
+  display: block;
+}
+#title,#views-timeago {
+  cursor: pointer;
+}

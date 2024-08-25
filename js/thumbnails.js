@@ -7,6 +7,11 @@ import {
     getTheme,
     modal_detector_loader,
 } from "./helper.js"
+import {
+    stringLimit,
+    timeFormat,
+    views_format
+} from "./common.js"
 
 let NextPageUrl = "";
 let totalNumberOfVideos = []
@@ -17,48 +22,6 @@ let isAtBottom = false;
 
 const quality = ['lowest', 'highest']
 quality.push('Download')
-
-function stringLimit(str, maxLength = 10) {
-    if (str.length > maxLength) {
-        return str.slice(0, maxLength - 3) + "..";
-    }
-    return str;
-}
-
-function timeFormat(sec) {
-    if (sec == -1) return "live"
-    sec = Number(sec);
-    var h = Math.floor(sec / 3600);
-    var m = Math.floor(sec % 3600 / 60);
-    var s = Math.floor(sec % 3600 % 60);
-
-    var hDisplay = h > 0 ? (h < 10 ? "0" + h + ":" : h + ":") : "";
-    var mDisplay = m > 0 ? (m < 10 ? "0" + m + ":" : m + ":") : "";
-    var sDisplay = s >= 0 ? (s < 10 ? "0" + s : s) : "";
-
-    if (mDisplay === "" && sDisplay !== "") return "0:" + sDisplay
-
-    return hDisplay + mDisplay + sDisplay;
-}
-
-function views_format(views) {
-    let bil = 1000000000
-    let mil = 1000000
-    let thousand = 1000
-
-    if (views > bil) {
-        return Math.round(views / bil) + "B"
-    }
-    else if (views > mil) {
-        return Math.round(views / mil) + "M"
-    }
-    else if (views > thousand) {
-        return Math.round(views / thousand) + "K"
-    }
-    else {
-        return views.toString()
-    }
-}
 
 // it takes each element and then append them to the main columns
 function grid_loader(e) {
