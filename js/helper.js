@@ -154,6 +154,6 @@ export function getUrl(src) {
 
     src = src[0] !== '/' ? '/' + src : src
     if (window.location.hostname === gh_domain)
-        return "zen-player" + src
+        return "/zen-player" + src
     return src
 }
