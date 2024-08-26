@@ -1,10 +1,13 @@
 function uptimeUrlSplitter(usable) {
     let res = []
     usable.forEach(e => {
+        if (e[1].type !== "https") return
         const total = e[1].stats.usage.users.total
+        //const total = e[1].stats.playback.ratio
+        if (total < 1000) return
         const url = e[1].uri
         res.push({
-            users: total,
+            factor: total,
             url: url
         })
     })
@@ -18,7 +21,7 @@ function sort(arr) {
     let leftArr = []
     let rightArr = []
     for (let i = 1; i < arr.length; i++) {
-        if (pivot.users < arr[i].users)
+        if (pivot.factor < arr[i].factor)
             rightArr.push(arr[i])
         else
             leftArr.push(arr[i])

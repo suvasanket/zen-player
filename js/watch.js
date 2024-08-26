@@ -8,6 +8,7 @@ import {
     video_audioSeparator,
     webm_mp4Separator,
     qualityExtract,
+    FormatDescription
 } from "./watch_helper.js"
 
 
@@ -36,17 +37,19 @@ video.addClass('vjs-waiting')
 
 const UrlParams = new URLSearchParams(window.location.search)
 let id = UrlParams.get("v")
-if (id) {
-    const def_qua = parseInt(id.charAt(id.length - 1))
-    id = id.slice(0, -1)
+document.addEventListener('DOMContentLoaded', () => {
+    if (id) {
+        const def_qua = parseInt(id.charAt(id.length - 1))
+        id = id.slice(0, -1)
 
-    if (def_qua === 1)
-        videoFetch(id, api, 1)
-    else if (def_qua === 2)
-        videoFetch(id, api, 2)
-    else
-        videoFetch(id, api)
-}
+        if (def_qua === 1)
+            videoFetch(id, api, 1)
+        else if (def_qua === 2)
+            videoFetch(id, api, 2)
+        else
+            videoFetch(id, api)
+    }
+})
 
 function PlayVideo(adaptiveFormats, formatStreams, default_quality) {
     video.removeClass('vjs-waiting')
@@ -128,7 +131,7 @@ function BottomLayoutGen(data) {
     subs.innerHTML = data.subCountText + " subscribers"
 
     const description = document.querySelector("#description")
-    const formatted = data.description.replace(/\n/g, `<br>`)
+    const formatted = FormatDescription(data.description)
     description.insertAdjacentHTML('beforeend', formatted)
 
     title.addEventListener("click", () => {
@@ -154,7 +157,7 @@ async function videoFetch(vid, api, default_quality) {
         try {
             const fetched = await fetch(api[currentIndex] + video_param + vid)
             const data = await fetched.json()
-            console.log(data)
+            //console.log(data)
 
             try {
                 PlayVideo(data.adaptiveFormats, data.formatStreams, default_quality)
@@ -178,15 +181,22 @@ async function videoFetch(vid, api, default_quality) {
             currentIndex++
             notification(
                 `Issue feteching video, Trying other server<br>Attempt: ${currentIndex}`,
-                2000,
-                `is-warning is-${getTheme()}`
+                `is-warning is-${getTheme()}`,
+                5000
             )
         }
     }
 
     notification(
         `All server are exhausted, Please try again later`,
-        7000,
-        `is-danger is-${getTheme()}`
+        `is-danger is-${getTheme()}`,
+        7000
     )
 }
+window.addEventListener('unhandledrejection', event => {
+    notification(
+        `${event.reason}<br>If you think you can fix it, open the console`,
+        `is-danger is-${getTheme()}`,
+        100000
+    )
+});

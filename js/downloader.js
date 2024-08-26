@@ -229,7 +229,7 @@ export function modal_loader(title, url) {
 
             const response = await Cobalt(url, audio_val, quality_val, codec_val, filestyle_val, dub_val);
             if (response.status === "error"){
-                notification(response.text, 5000, `is-danger is-${getTheme()}`)
+                notification(response.text, `is-danger is-${getTheme()}`, 5000)
                 download_btn_refresh("#", "generate", download_btn);
             }
             else {

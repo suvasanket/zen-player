@@ -46,3 +46,24 @@ export function qualityExtract(arr, def, dash) {
     })
     return res
 }
+
+export function FormatDescription(text) {
+    // Regular expression to match URLs
+    const urlPattern = /(https?:\/\/\S+)/g;
+
+    // First, replace newlines with a placeholder
+    const placeholder = '###NEWLINE###';
+    text = text.replace(/\n/g, placeholder);
+
+    // Process URLs
+    text = text.replace(urlPattern, (url) => {
+        let domain = url.replace(/https?:\/\//, '').split('/')[0];
+            // Remove 'www.' if it exists
+            domain = domain.replace(/^www\./, '');
+            const path = url.split('/').slice(1).join('/');
+            return `<a href="${url}">${domain}/${path}</a>`;
+        });
+
+        // Replace placeholders with <br> tags
+        return text.replace(new RegExp(placeholder, 'g'), '<br>');
+}

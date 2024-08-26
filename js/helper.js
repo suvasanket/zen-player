@@ -85,7 +85,7 @@ export function gen(tag) {
     return element
 }
 
-export function notification(content, duration, Class) {
+export function notification(content, Class, duration) {
     const notification = gen("div").attr("class", "notification is-family-monospace " + Class)
     const botton = gen("button").attr("class", "delete")
     const cont = gen("p")
@@ -101,10 +101,12 @@ export function notification(content, duration, Class) {
 
     document.body.appendChild(notification)
 
-    setTimeout(() => {
-        notification.remove()
-    }, duration)
-    notification_detector_loader()
+    if (duration) {
+        setTimeout(() => {
+            notification.remove()
+        }, duration)
+        notification_detector_loader()
+    }
 }
 
 export function stringLimit(str, maxLength = 10) {
