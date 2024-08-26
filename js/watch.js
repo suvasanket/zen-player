@@ -1,16 +1,15 @@
-import {
-    HeaderGenerator,
-    views_format
-} from "./common.js"
 import { GetApi } from "./Instances.js"
+import {
+    views_format,
+    notification,
+    getTheme,
+} from "./helper.js"
 import {
     video_audioSeparator,
     webm_mp4Separator,
     qualityExtract,
 } from "./watch_helper.js"
 
-// generate header
-HeaderGenerator()
 
 // generate all endPoint
 const api = GetApi()
@@ -177,9 +176,17 @@ async function videoFetch(vid, api, default_quality) {
         }
         catch (err) {
             currentIndex++
+            notification(
+                `Issue feteching video, Trying other server<br>Attempt: ${currentIndex}`,
+                2000,
+                `is-warning is-${getTheme()}`
+            )
         }
     }
 
-    alert(`The probability is so low, it's barely on the chart.
-        Guess even luck decided to take a day off!`)
+    notification(
+        `All server are exhausted, Please try again later`,
+        7000,
+        `is-danger is-${getTheme()}`
+    )
 }

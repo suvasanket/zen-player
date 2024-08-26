@@ -12,23 +12,42 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
     <link rel="manifest" href="favicons/site.webmanifest">
 
+    <!--css-->
     <link rel="stylesheet" href="style/header.css" />
     <link rel="stylesheet" href="style/index_style.css" />
     <title>zen-player</title>
   </head>
   <body>
+    <header class="header" id="header">
+      <a class="logo">
+        <img src="./assets/logo0.png" id="header-logo"/>
+        <span class="title">zen</span>
+      </a>
+      <div class="search-bar">
+        <form id="inputForm">
+          <input
+              class="input is-rounded ml-5"
+              type="text"
+              placeholder="Search 'cat videos' + Enter"
+              id="input"
+              />
+        </form>
+      </div>
+      <div class="spacer"></div>
+    </header>
+
     <div class="m-4" id="container">
       <div class="fixed-grid has-5-cols" id="fixed-grid">
         <div class="grid mt-4" id="columns">
         </div>
       </div>
     </div>
-    <script type="module" src="./js/common.js"></script>
     <script type="module" src="./js/helper.js"></script>
-    <script type="module" src="./js/thumbnails.js"></script>
+    <script type="module" src="./js/Home_Search.js"></script>
     <script type="module" src="./js/index.js"></script>
     <script type="module" src="./js/downloader.js"></script>
     <script type="module" src="./js/mobile.js"></script>
     <script type="module" src="./js/Instances.js"></script>
+    <script type="module" src="./js/Header.js"></script>
   </body>
 </html>

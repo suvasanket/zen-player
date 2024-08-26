@@ -27,6 +27,24 @@
   </head>
 
   <body>
+    <header class="header" id="header">
+      <a class="logo">
+        <img src="./assets/logo0.png" id="header-logo"/>
+        <span class="title">zen</span>
+      </a>
+      <div class="search-bar">
+        <form id="inputForm">
+          <input
+              class="input is-rounded ml-5"
+              type="text"
+              placeholder="Search 'cat videos' + Enter"
+              id="input"
+              />
+        </form>
+      </div>
+      <div class="spacer"></div>
+    </header>
+
     <div class="m-4">
       <div class="box video-box">
         <div class="video-container">
@@ -83,10 +101,11 @@
         Comments / Related videos
       </div>
 
-      <script src="js/common.js" type="module"></script>
+      <script src="js/helper.js" type="module"></script>
       <script src="js/watch.js" type="module"></script>
       <script src="js/watch_helper.js" type="module"></script>
       <script src="js/Instances.js" type="module"></script>
+      <script src="js/Header.js" type="module"></script>
     </div>
   </body>
 </html>

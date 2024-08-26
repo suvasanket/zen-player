@@ -1,4 +1,10 @@
-import { gen, yt_domain, cobalt_api, notification, getTheme } from './helper.js'
+import {
+    gen,
+    yt_domain,
+    cobalt_api,
+    notification,
+    getTheme,
+} from './helper.js'
 
 async function Cobalt(vurl, audio, quality, codec, filestyle, dub, metadata) {
     const url = yt_domain + vurl
@@ -223,7 +229,7 @@ export function modal_loader(title, url) {
 
             const response = await Cobalt(url, audio_val, quality_val, codec_val, filestyle_val, dub_val);
             if (response.status === "error"){
-                notification(response.text,5000,`is-danger is-${getTheme()}`)
+                notification(response.text, 5000, `is-danger is-${getTheme()}`)
                 download_btn_refresh("#", "generate", download_btn);
             }
             else {
