@@ -3,6 +3,7 @@ import { LoadApi } from "./Instances.js"
 import {
     modal_detector_loader,
     notification_detector_loader,
+    unhandeledRejection,
 } from "./helper.js"
 
 const inputField = document.querySelector("#input")
@@ -18,4 +19,5 @@ document.addEventListener('DOMContentLoaded', () => {
     notification_detector_loader()
 
     piped_fetch(query)
+    unhandeledRejection()
 })

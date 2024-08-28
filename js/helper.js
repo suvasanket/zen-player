@@ -1,3 +1,5 @@
+const gh_domain = "suvasanket.github.io"
+
 const individous_instance = [
     "https://yewtu.be",
     "https://iv.ggtyler.dev",
@@ -60,6 +62,8 @@ export function notification_detector_loader() {
 
         $delete.addEventListener('click', () => {
             $notification.parentNode.removeChild($notification);
+            if (!document.querySelector(".notification"))
+                document.querySelector('#notification-center').remove()
         });
     });
 }
@@ -86,24 +90,26 @@ export function gen(tag) {
 }
 
 export function notification(content, Class, duration) {
-    const notification = gen("div").attr("class", "notification is-family-monospace " + Class)
+    let notification_center = document.querySelector("#notification-center")
+    if (!notification_center) {
+        notification_center = gen("div").attr("id", "notification-center")
+        document.body.appendChild(notification_center)
+    }
+
+    const notification = gen("div").attr("class", `notification is-family-monospace is-${getTheme()} ` + Class)
     const botton = gen("button").attr("class", "delete")
     const cont = gen("p")
     cont.innerHTML = content
     notification.appendChild(botton)
     notification.appendChild(cont)
 
-    notification.style.position = 'fixed'
-    notification.style.top = '10px'
-    notification.style.right = '10px'
-    notification.style.zIndex = '1000'
-    notification.style.maxWidth = '500px'
-
-    document.body.appendChild(notification)
+    notification_center.appendChild(notification)
 
     if (duration) {
         setTimeout(() => {
             notification.remove()
+            if (!document.querySelector(".notification"))
+                notification_center.remove()
         }, duration)
         notification_detector_loader()
     }
@@ -132,7 +138,7 @@ export function timeFormat(sec) {
     return hDisplay + mDisplay + sDisplay;
 }
 
-export function views_format(views) {
+export function numberFormat(views) {
     let bil = 1000000000
     let mil = 1000000
     let thousand = 1000
@@ -152,10 +158,22 @@ export function views_format(views) {
 }
 
 export function getUrl(src) {
-    const gh_domain = "suvasanket.github.io"
-
     src = src[0] !== '/' ? '/' + src : src
     if (window.location.hostname === gh_domain)
         return "/zen-player" + src
     return src
+}
+
+export function ifDev(fun) {
+    if (window.location.hostname !== gh_domain)
+        fun()
+}
+export function unhandeledRejection() {
+    window.addEventListener('unhandledrejection', event => {
+        notification(
+            `${event.reason}<br>If you think you can fix it, open the console`,
+            `is-danger`,
+            100000
+        )
+    })
 }

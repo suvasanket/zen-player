@@ -6,6 +6,7 @@
 
     <!--/bulma/-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet" />
@@ -96,14 +97,42 @@
             <span id="subs" class="is-size-7 has-skeleton">111M</span>
           </div>
         </div>
+
+        <div class="level-right">
+          <div class="level-item button is-inverted is-rounded">
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fas fa-thumbs-up"></i>
+              </span>
+              <span id="like-count">like</span>
+            </span>
+          </div>
+          <div class="level-item button is-rounded">
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fas fa-thumbs-down"></i>
+              </span>
+              <span id="dislike-count">dislike</span>
+            </span>
+          </div>
+
+          <a class="level-item button is-danger is-inverted is-rounded" id="youtube-link">
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fa-brands fa-youtube"></i>
+              </span>
+              <span>YouTube</span>
+            </span>
+          </a>
+        </div>
       </nav>
       <div class="box">
         Comments / Related videos
       </div>
 
       <script src="js/helper.js" type="module"></script>
-      <script src="js/watch.js" type="module"></script>
-      <script src="js/watch_helper.js" type="module"></script>
+      <script src="js/Watch.js" type="module"></script>
+      <script src="js/index_watch.js" type="module"></script>
       <script src="js/Instances.js" type="module"></script>
       <script src="js/Header.js" type="module"></script>
     </div>

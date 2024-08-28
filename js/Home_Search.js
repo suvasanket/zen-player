@@ -8,7 +8,7 @@ import {
     modal_detector_loader,
     stringLimit,
     timeFormat,
-    views_format,
+    numberFormat,
     getUrl
 } from "./helper.js"
 
@@ -88,10 +88,10 @@ function grid_loader(e) {
             .inner(`${stringLimit(e.title, 37)}`)
 
         if (e.uploadedDate) {
-            subtitle.innerHTML = `${views_format(e.views)} views • ${e.uploadedDate}`
+            subtitle.innerHTML = `${numberFormat(e.views)} views • ${e.uploadedDate}`
         }
         else {
-            subtitle.innerHTML = `${views_format(e.views)} watching`
+            subtitle.innerHTML = `${numberFormat(e.views)} watching`
         }
 
         const channel_logo = gen("img")

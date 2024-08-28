@@ -26,3 +26,17 @@
 .search-bar input {
     width: 100%;
 }
+#notification-center {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 500px;
+    max-height: 100%;
+    overflow-y: auto;
+    background-color: transparent;
+    /*background-color: rgba(0, 0, 0, 0.3);*/
+    /*backdrop-filter: blur(2px);*/
+    /*box-shadow: -2px 0 10px rgba(0,0,0,0.2);*/
+    /*padding: 70px 15px 15px 15px;*/
+    padding: 15px;
+}

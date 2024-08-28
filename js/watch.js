@@ -1,21 +1,11 @@
-import { GetApi } from "./Instances.js"
 import {
-    views_format,
     notification,
-    getTheme,
-} from "./helper.js"
-import {
-    video_audioSeparator,
-    webm_mp4Separator,
-    qualityExtract,
-    FormatDescription
-} from "./watch_helper.js"
+    ifDev,
+    numberFormat,
+    yt_domain,
+} from "./helper.js";
 
-
-// generate all endPoint
-const api = GetApi()
-
-const video = videojs('video-player', {
+export const video = videojs('video-player', {
     controlBar: {
         children: [
             "playToggle",
@@ -33,23 +23,55 @@ const video = videojs('video-player', {
         ]
     },
 })
-video.addClass('vjs-waiting')
 
-const UrlParams = new URLSearchParams(window.location.search)
-let id = UrlParams.get("v")
-document.addEventListener('DOMContentLoaded', () => {
-    if (id) {
-        const def_qua = parseInt(id.charAt(id.length - 1))
-        id = id.slice(0, -1)
+function video_audioSeparator(arr) {
+    let video_adaptiveFormats = []
+    let audio_adaptiveFormats = []
+    const regex = /(audio\/|video\/)/;
 
-        if (def_qua === 1)
-            videoFetch(id, api, 1)
-        else if (def_qua === 2)
-            videoFetch(id, api, 2)
-        else
-            videoFetch(id, api)
-    }
-})
+    arr.forEach(e => {
+        const type = (e.type).match(regex)
+        if (type[0] === "audio/")
+            audio_adaptiveFormats.push(e)
+        if (type[0] === "video/")
+            video_adaptiveFormats.push(e)
+    })
+    return [audio_adaptiveFormats, video_adaptiveFormats]
+}
+function webm_mp4Separator(arr) {
+    let webm = []
+    let mp4 = []
+    const regex = /(audio|video)\/([^;]+)/;
+    arr.forEach(e => {
+        const type = (e.type).match(regex)
+        if (type[2] === "webm")
+            webm.push(e)
+        if (type[2] === "mp4")
+            mp4.push(e)
+    })
+    return [webm, mp4]
+}
+
+function qualityExtract(arr, def, dash) {
+    let res = []
+    if (dash) res.push({
+        src: dash,
+        type: "application/dash+xml",
+        label: "DASH"
+    })
+    arr.forEach(e => {
+        const obj = {}
+        const qualityLabel = e.qualityLabel
+        const url = e.url
+
+        if (def === qualityLabel) obj.selected = true
+        if (url) obj.src = url
+        if (qualityLabel) obj.label = qualityLabel
+        obj.type = "video/webm"
+        res.push(obj)
+    })
+    return res
+}
 
 function PlayVideo(adaptiveFormats, formatStreams, default_quality) {
     video.removeClass('vjs-waiting')
@@ -109,15 +131,16 @@ function PlayVideo(adaptiveFormats, formatStreams, default_quality) {
 }
 
 const removeSkele = (element) => element.classList.remove("has-skeleton")
-function BottomLayoutGen(data) {
+function BottomLayoutGen(data, dis_data, vid) {
     const title = document.querySelector("#title")
     removeSkele(title)
     title.innerHTML = data.title
 
     const views_time = document.querySelector("#views-timeago")
     removeSkele(views_time)
-    views_time.innerHTML = views_format(data.viewCount) + " views • " + data.publishedText
+    views_time.innerHTML = numberFormat(data.viewCount) + " views • " + data.publishedText
 
+    // nav left elements
     const channel_logo_img = document.querySelector("#channel-logo-img")
     removeSkele(channel_logo_img)
     channel_logo_img.src = data.authorThumbnails[2].url
@@ -131,7 +154,7 @@ function BottomLayoutGen(data) {
     subs.innerHTML = data.subCountText + " subscribers"
 
     const description = document.querySelector("#description")
-    const formatted = FormatDescription(data.description)
+    const formatted = data.descriptionHtml.replace(/\n/g, '<br>')
     description.insertAdjacentHTML('beforeend', formatted)
 
     title.addEventListener("click", () => {
@@ -140,9 +163,22 @@ function BottomLayoutGen(data) {
     views_time.addEventListener("click", () => {
         description.classList.toggle("is-open")
     })
+
+    // nav right elements
+    const dislike_count = document.querySelector("#dislike-count")
+    const like_count = document.querySelector("#like-count")
+    if (dis_data) {
+        dislike_count.innerHTML = numberFormat(dis_data.dislikes)
+        like_count.innerHTML = numberFormat(dis_data.likes)
+    }
+    else {
+        like_count.innerHTML = numberFormat(data.likeCount)
+    }
+    const youtube_link = document.querySelector("#youtube-link")
+    youtube_link.href = `${yt_domain}/watch?v=${vid}`
 }
 
-async function videoFetch(vid, api, default_quality) {
+export async function videoFetch(vid, api, default_quality) {
     const ret = () => {
         video.removeClass('vjs-waiting')
         return
@@ -153,11 +189,16 @@ async function videoFetch(vid, api, default_quality) {
     const video_param = "/api/v1/videos/"
     let currentIndex = 0
 
+    // dislike fetching
+    const fetched_dislike = await fetch(`https://returnyoutubedislikeapi.com/votes?videoId=${vid}`)
+    const dis_data = await fetched_dislike.json()
+
+    // video fetching
     while (currentIndex < api.length) {
         try {
             const fetched = await fetch(api[currentIndex] + video_param + vid)
             const data = await fetched.json()
-            //console.log(data)
+            ifDev(() => console.log(data))
 
             try {
                 PlayVideo(data.adaptiveFormats, data.formatStreams, default_quality)
@@ -168,7 +209,7 @@ async function videoFetch(vid, api, default_quality) {
                 ret()
             }
             try {
-                BottomLayoutGen(data)
+                BottomLayoutGen(data, dis_data, vid)
                 ret()
             }
             catch (err) {
@@ -181,7 +222,7 @@ async function videoFetch(vid, api, default_quality) {
             currentIndex++
             notification(
                 `Issue feteching video, Trying other server<br>Attempt: ${currentIndex}`,
-                `is-warning is-${getTheme()}`,
+                `is-warning`,
                 5000
             )
         }
@@ -189,14 +230,7 @@ async function videoFetch(vid, api, default_quality) {
 
     notification(
         `All server are exhausted, Please try again later`,
-        `is-danger is-${getTheme()}`,
+        `is-danger`,
         7000
     )
 }
-window.addEventListener('unhandledrejection', event => {
-    notification(
-        `${event.reason}<br>If you think you can fix it, open the console`,
-        `is-danger is-${getTheme()}`,
-        100000
-    )
-});
