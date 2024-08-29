@@ -5,14 +5,12 @@ import {
     videoFetch
 } from "./Watch.js"
 
-// generate all endPoint
-const api = GetApi()
-
 const UrlParams = new URLSearchParams(window.location.search)
 let id = UrlParams.get("v")
 
 document.addEventListener('DOMContentLoaded', () => {
     video.addClass('vjs-waiting')
+    const api = GetApi()
 
     if (id) {
         const def_qua = parseInt(id.charAt(id.length - 1))
