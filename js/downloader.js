@@ -225,7 +225,7 @@ export function modal_loader(title, url) {
 
             audio_val = audio_val === "audio" ? true : false
             if(quality_val === "4K") quality_val = 2160
-            if(quality_val === "8K+") quality_val = max
+            if(quality_val === "8K+") quality_val = "max"
 
             const response = await Cobalt(url, audio_val, quality_val, codec_val, filestyle_val, dub_val);
             if (response.status === "error"){

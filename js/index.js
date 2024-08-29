@@ -4,6 +4,7 @@ import {
     modal_detector_loader,
     notification_detector_loader,
     unhandeledRejection,
+    printSourceLink,
 } from "./helper.js"
 
 const inputField = document.querySelector("#input")
@@ -14,6 +15,7 @@ if (query) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    printSourceLink()
     LoadApi()
     modal_detector_loader()
     notification_detector_loader()

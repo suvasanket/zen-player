@@ -1,6 +1,6 @@
 import {
     notification,
-    ifDev,
+    ifDep,
     numberFormat,
     yt_domain,
 } from "./helper.js";
@@ -198,7 +198,8 @@ export async function videoFetch(vid, api, default_quality) {
         try {
             const fetched = await fetch(api[currentIndex] + video_param + vid)
             const data = await fetched.json()
-            ifDev(() => console.log(data))
+            if (!ifDep())
+                console.log(data)
 
             try {
                 PlayVideo(data.adaptiveFormats, data.formatStreams, default_quality)

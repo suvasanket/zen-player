@@ -1,14 +1,18 @@
 import { GetApi } from "./Instances.js"
-import { unhandeledRejection } from "./helper.js"
+import {
+    unhandeledRejection,
+    printSourceLink
+} from "./helper.js"
 import {
     video,
-    videoFetch
+    videoFetch,
 } from "./Watch.js"
 
 const UrlParams = new URLSearchParams(window.location.search)
 let id = UrlParams.get("v")
 
 document.addEventListener('DOMContentLoaded', () => {
+    printSourceLink()
     video.addClass('vjs-waiting')
     const api = GetApi()
 

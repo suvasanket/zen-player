@@ -9,7 +9,8 @@ import {
     stringLimit,
     timeFormat,
     numberFormat,
-    getUrl
+    getUrl,
+    ifDep
 } from "./helper.js"
 
 let NextPageUrl = "";
@@ -85,7 +86,8 @@ function grid_loader(e) {
 
         const title = gen("span")
             .attr("class", "is-size-7 has-text-weight-bold")
-            .inner(`${stringLimit(e.title, 37)}`)
+            .inner(`${e.title}`)
+        //.inner(`${stringLimit(e.title, 37)}`)
 
         if (e.uploadedDate) {
             subtitle.innerHTML = `${numberFormat(e.views)} views • ${e.uploadedDate}`
@@ -205,7 +207,8 @@ export async function piped_fetch(query, nextPageUrl, filter = "videos") {
         const response = await fetch(url);
         const data = await response.json();
         if (document.querySelector("#spiner")) spiner_stop()
-        //console.log(data)
+        if (!ifDep())
+            console.log(data)
 
         if (data.items) {
             data.items.forEach((e, index) => grid_loader(e, index))

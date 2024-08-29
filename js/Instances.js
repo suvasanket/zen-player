@@ -35,7 +35,7 @@ async function InstanceGenerator(endpoint) {
     try {
         const response = await fetch(endpoint)
         const data = await response.json()
-        const usable = data.filter(e => e[1].api && !e[1].monitor.down)
+        const usable = data.filter(e => e[1].api && e[1].monitor && !e[1].monitor.down)
 
         const sorted = sort(uptimeUrlSplitter(usable))
         return sorted.map(e => e.url)

@@ -164,14 +164,33 @@ export function getUrl(src) {
     return src
 }
 
-export function ifDev(fun) {
-    if (window.location.hostname !== gh_domain)
-        fun()
+export const ifDep = () => window.location.hostname === gh_domain
+
+export function printSourceLink() {
+    if (ifDep())
+        console.log(`
+ _______________________________
+/ If you want to change         \\
+\\ anything, checkout the source /
+ -------------------------------
+   \\
+    \\
+     \\
+                '-.
+      .---._     \\ .--'
+    /       \`-..__)  ,-'
+   |    0           /
+    --.__,   .__.,\`
+     \`-.___'._\\_.'
+
+Source: "https://github.com/suvasanket/zen-player"
+`);
 }
+
 export function unhandeledRejection() {
     window.addEventListener('unhandledrejection', event => {
         notification(
-            `${event.reason}<br>If you think you can fix it, open the console`,
+            `${event.reason}<br>God: If you can fix it, open the console`,
             `is-danger`,
             100000
         )
