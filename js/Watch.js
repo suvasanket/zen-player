@@ -3,6 +3,8 @@ import {
     ifDep,
     numberFormat,
     yt_domain,
+    gen,
+    spinnerToggle,
 } from "./helper.js";
 
 export const video = videojs('video-player', {
@@ -22,6 +24,8 @@ export const video = videojs('video-player', {
             "fullscreenToggle"
         ]
     },
+    loadingSpinner: true,
+    bigPlayButton: false
 })
 
 function video_audioSeparator(arr) {
@@ -110,10 +114,7 @@ function PlayVideo(adaptiveFormats, formatStreams, default_quality) {
         }
         requestAnimationFrame(syncAudioVideo);
     }
-    video.ready(() => {
-        video.play()
-        syncAudioVideo()
-    })
+
     video.on('play', () => syncAudioVideo())
     video.on('pause', () => {
         video.pause()
@@ -128,6 +129,9 @@ function PlayVideo(adaptiveFormats, formatStreams, default_quality) {
         syncAudioVideo()
     })
     video.on('qualitySelected', () => audio.currentTime = video.currentTime())
+
+    video.play()
+    syncAudioVideo()
 }
 
 const removeSkele = (element) => element.classList.remove("has-skeleton")
@@ -178,52 +182,134 @@ function BottomLayoutGen(data, dis_data, vid) {
     youtube_link.href = `${yt_domain}/watch?v=${vid}`
 }
 
-export async function videoFetch(vid, api, default_quality) {
-    const ret = () => {
-        video.removeClass('vjs-waiting')
-        return
+class Comment {
+    comment_box = gen("div").class("container is-fluid m-3")
+    level = gen("div").class("level")
+
+    channel_logo = gen("a").class("level-item")
+        .attr("id", "channel-logo")
+        .sty("display: flex; align-items: center; margin-right: 7px; max-width: 35px")
+    channel_logo_fig = gen("figure").class("image")
+        .sty("height: 35px; width:35px")
+    channel_logo_img = gen("img").class("is-rounded")
+
+    right_stuff = gen("div").class("level-item is-flex is-flex-direction-column is-align-items-flex-start")
+        .sty("max-width: 100%;")
+
+    comment_header = gen("span").class("icon-text")
+    comment_author = gen("span").class("has-text-weight-bold has-text-primary-100")
+    badges = gen("span").class("icon")
+    verified_icon = gen("i").class("fa-solid fa-circle-check fa-xs mr-1")
+    pinned_icon = gen("i").class("fa-solid fa-thumbtack fa-xs").sty("color: #B197FC;")
+
+    comment_content = gen("div")
+        .sty("word-break: break-word;")
+
+    comment_footer = gen("span")
+    replies = gen("a").class("has-text-weight-bold")
+    like_icon = gen("span").class("icon ml-2").inner(`<i class="fa-solid fa-thumbs-up fa-sm"></i>`)
+    likes = gen("span").sty("font-size: 13px;")
+
+    source = "source-youtube"
+
+    adder(arg) {
+        this.channel_logo_fig.appendChild(this.channel_logo_img)
+        this.channel_logo.appendChild(this.channel_logo_fig)
+
+        //top
+        if (arg.verified)
+            this.badges.appendChild(this.verified_icon)
+        if (arg.isPinned)
+            this.badges.appendChild(this.pinned_icon)
+        this.comment_header.appendChild(this.comment_author)
+        this.comment_header.appendChild(this.badges)
+
+        //bottom
+        this.comment_footer.appendChild(this.replies)
+        this.comment_footer.appendChild(this.like_icon)
+        this.comment_footer.appendChild(this.likes)
+
+        // body
+        this.right_stuff.appendChild(this.comment_header)
+        this.right_stuff.appendChild(this.comment_content)
+        this.right_stuff.appendChild(this.comment_footer)
+
+        if (this.channel_logo_img.src)
+            this.level.appendChild(this.channel_logo)
+        this.level.appendChild(this.right_stuff)
+
+        this.comment_box.appendChild(this.level)
     }
+    constructor(arg) {
+        let decodedString
+        if (arg.kind) {
+            if (arg.kind !== "t1")
+                return
+            decodedString = arg.data.body_html.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+            this.source = "source-reddit"
+        }
+        else {
+            this.source = "source-youtube"
+        }
+
+        if (arg.authorThumbnails)
+            this.channel_logo_img.src = arg.authorThumbnails[0].url
+
+        if (this.source === "source-youtube") {
+            this.comment_author.innerHTML = arg.author
+            this.comment_content.innerHTML = arg.contentHtml
+            this.likes.innerHTML = numberFormat(arg.likeCount)
+        } else {
+            this.comment_author.innerHTML = arg.data.author
+            this.comment_content.innerHTML = decodedString
+            this.likes.innerHTML = numberFormat(arg.data.score)
+        }
+
+        //this.replies.innerHTML = `${arg.replies.replyCount} replies`
+        this.replies.innerHTML = `replies`
+
+        this.adder(arg)
+
+        document.getElementById(this.source).appendChild(this.comment_box)
+    }
+
+    addToParent(parent) {
+        parent.appendChild(this.comment_box)
+    }
+}
+function CommentSectionGen(data) {
+    data.comments.forEach(e => {
+        const comment = new Comment(e)
+        //comment.addToParent(document.querySelector("#comments"))
+    })
+}
+
+async function videoFetch(vid, api) {
+    video.addClass('vjs-waiting')
     if (!api.length)
         api = ["https://invidious.perennialte.ch"]
 
     const video_param = "/api/v1/videos/"
     let currentIndex = 0
 
-    // dislike fetching
-    const fetched_dislike = await fetch(`https://returnyoutubedislikeapi.com/votes?videoId=${vid}`)
-    const dis_data = await fetched_dislike.json()
-
-    // video fetching
     while (currentIndex < api.length) {
         try {
-            const fetched = await fetch(api[currentIndex] + video_param + vid)
-            const data = await fetched.json()
-            if (!ifDep())
-                console.log(data)
-
-            try {
-                PlayVideo(data.adaptiveFormats, data.formatStreams, default_quality)
-                ret()
-            }
-            catch (err) {
-                console.error("Error Playing Video: ", err)
-                ret()
-            }
-            try {
-                BottomLayoutGen(data, dis_data, vid)
-                ret()
-            }
-            catch (err) {
-                console.error("Error Bottom Layout Generation: ", err)
-                ret()
-            }
-            return
+            const fetched = await fetch(api[currentIndex] + video_param + vid, { signal: AbortSignal.timeout(5000) })
+            if (fetched.ok)
+                return fetched.json()
+            else
+                notification(
+                    `Internal server issue,<br>Dont't worry we have other servers<br>Attempt: ${currentIndex}`,
+                    `is-warning is-size-6`,
+                    5000
+                )
+            currentIndex++
         }
         catch (err) {
             currentIndex++
             notification(
-                `Issue feteching video, Trying other server<br>Attempt: ${currentIndex}`,
-                `is-warning`,
+                `Error fetching,<br>Dont't worry we have other servers<br>Attempt: ${currentIndex}`,
+                `is-warning is-size-6`,
                 5000
             )
         }
@@ -234,4 +320,122 @@ export async function videoFetch(vid, api, default_quality) {
         `is-danger`,
         7000
     )
+    return
+}
+
+async function dislikeFetch(vid) {
+    const fetched_dislike = await fetch(`https://returnyoutubedislikeapi.com/votes?videoId=${vid}`)
+    return fetched_dislike.json()
+}
+
+async function commentsFetch(vid, api, source = "youtube", sort_by = "top", cont) {
+    spinnerToggle(document.querySelector("#comments"))
+    let i = 0
+    while (i < vid.length) {
+        try {
+            const url = new URL(`${api[i]}/api/v1/comments/${vid}`)
+            url.searchParams.append('source', source)
+            url.searchParams.append('sort_by', sort_by)
+            if (cont)
+                url.searchParams.append('source', cont)
+
+            const fetched = await fetch(url)
+            if (fetched.ok) {
+                spinnerToggle(document.querySelector("#comments"))
+                return fetched.json()
+            } else {
+                spinnerToggle(document.querySelector("#comments"))
+                return false
+            }
+        }
+        catch (e) {
+            i++
+        }
+    }
+    return
+}
+
+function CommentButtons(api, vid) {
+    const commentYTButton = document.querySelector("#youtube-comment")
+    const commentRedditButton = document.querySelector("#reddit-comment")
+    const source_reddit = document.querySelector("#source-reddit")
+    const source_youtube = document.querySelector("#source-youtube")
+
+    commentYTButton.addEventListener("click", async () => {
+        if (!commentYTButton.classList.contains("is-inverted")) {
+            commentYTButton.classList.toggle("is-inverted");
+            commentRedditButton.classList.toggle("is-inverted");
+        }
+        source_reddit.classList.add("is-hidden")
+        source_reddit.classList.remove("is-block")
+        source_youtube.classList.remove("is-hidden")
+        source_youtube.classList.add("is-block")
+    });
+    commentRedditButton.addEventListener("click", async () => {
+        let avail = true
+        if (source_reddit.childNodes.length <= 1) {
+            const comment_data = await commentsFetch(vid, api, "reddit")
+            if (comment_data) {
+                source_youtube.classList.add("is-hidden")
+                source_reddit.classList.remove("is-hidden")
+                source_reddit.classList.add("is-block")
+                CommentSectionGen(comment_data)
+            }
+            else {
+                avail = false
+                notification(`Sorry, 😢<br>No reddit thread found for this video`, "is-warning is-size-6", 4000)
+            }
+        }
+        else {
+            source_youtube.classList.remove("is-block")
+            source_youtube.classList.add("is-hidden")
+            source_reddit.classList.remove("is-hidden")
+            source_reddit.classList.add("is-block")
+        }
+        if (avail && commentYTButton.classList.contains("is-inverted")) {
+            commentYTButton.classList.toggle("is-inverted");
+            commentRedditButton.classList.toggle("is-inverted");
+        }
+    });
+}
+
+export async function watch(vid, api) {
+    const def_quality = parseInt(vid.charAt(vid.length - 1))
+    vid = vid.slice(0, -1)
+
+    const ret = () => {
+        video.removeClass('vjs-waiting')
+        return
+    }
+
+    const vid_data = await videoFetch(vid, api)
+    const dis_data = await dislikeFetch(vid)
+    const comment_data = await commentsFetch(vid, api)
+
+    if (!ifDep()) {
+        console.log(comment_data)
+    }
+
+    document.title = vid_data.title
+    try {
+        PlayVideo(vid_data.adaptiveFormats, vid_data.formatStreams, def_quality)
+        ret()
+    }
+    catch (err) {
+        console.error("Error Playing Video: ", err)
+        ret()
+    }
+
+    try {
+        BottomLayoutGen(vid_data, dis_data, vid)
+        ret()
+    }
+    catch (err) {
+        console.error("Error Bottom Layout Generation: ", err)
+        ret()
+    }
+    CommentSectionGen(comment_data)
+    CommentButtons(api, vid);
+
+    return
 }

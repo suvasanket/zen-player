@@ -52,7 +52,6 @@
           <video
               id="video-player"
               class="video-js vjs-theme-forest"
-              preload="auto"
               controls
               >
           </video>
@@ -126,8 +125,26 @@
           </a>
         </div>
       </nav>
-      <div class="box">
-        Comments / Related videos
+      <div class="p-4">
+        <div class="button is-rounded">
+          Switch
+        </div>
+
+        <div class="pt-4" id="comment-section">
+          <div class="buttons">
+            <div id="youtube-comment"class="button is-rounded is-inverted">youtube</div>
+            <div id="reddit-comment" class="button is-rounded">reddit</div>
+            <div class="button is-rounded is-inverted">top</div>
+            <div class="button is-rounded">new</div>
+          </div>
+          <div id="comments">
+            <!--appended here-->
+            <div id="source-youtube" class="">
+            </div>
+            <div id="source-reddit" class="is-hidden">
+            </div>
+          </div>
+        </div>
       </div>
 
       <script src="js/helper.js" type="module"></script>

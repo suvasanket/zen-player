@@ -93,75 +93,75 @@ export function modal_loader(title, url) {
     const unique_id = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:\?|&|$)/) //[v=asdas, asdas]
 
     const modal = gen("div")
-        .attr("class", "modal")
+        .class("modal")
         .attr("id", "downloader-modal" + unique_id[1])
-    const modal_bg = gen("div").attr("class", "modal-background")
-    const modal_cont = gen("div").attr("class", "modal-content m-3")
-    const box = gen("div").attr("class", "box is-family-monospace")
+    const modal_bg = gen("div").class("modal-background")
+    const modal_cont = gen("div").class("modal-content m-3")
+    const box = gen("div").class("box is-family-monospace")
     const H = gen("p")
-        .attr("class", "title is-family-primary	")
+        .class("title is-family-primary	")
         .inner("Download")
     const vtitle = gen("p")
-        .attr("class", "subtitle is-6 mt-3 mb-3")
+        .class("subtitle is-6 mt-3 mb-3")
         .inner(title)
 
-    const quality_title = gen("div").attr("class", "title is-6 mb-1").inner("Quality")
-    const codec_title = gen("div").attr("class", "title is-6 mb-1").inner("Codec")
-    const filestyle_title = gen("div").attr("class", "title is-6 mb-1").inner("FileName")
+    const quality_title = gen("div").class("title is-6 mb-1").inner("Quality")
+    const codec_title = gen("div").class("title is-6 mb-1").inner("Codec")
+    const filestyle_title = gen("div").class("title is-6 mb-1").inner("FileName")
 
-    const quality_subtitle = gen("p").attr("class", "is-size-7")
+    const quality_subtitle = gen("p").class("is-size-7")
         .inner(`If the selected quality is not available, the closest quality will be used`)
-    const codec_subtitle = gen("p").attr("class", "is-size-7")
+    const codec_subtitle = gen("p").class("is-size-7")
     codec_subtitle.innerHTML = `
         h264: supported in all platforms, avg. details, max quality 1080.<br>
         av1: best quality, small file, supports 4k & HDR.<br>
         vp9: best quality, double file size, supports 4k & HDR.
         `
-    const filestyle_subtitle = gen("p").attr("class", "is-size-7")
+    const filestyle_subtitle = gen("p").class("is-size-7")
         .inner(`How the file should be named`)
 
     //opts
-    const audio = gen("div").attr("class", "tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
+    const audio = gen("div").class("tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
     let audio_selector = gen("ul").attr("id", "audio_selector")
     audio_val = option_generator(unique_id[1], audio_selector, audio_opts, (e) => { audio_val = e })
 
-    const quality = gen("div").attr("class", "tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
+    const quality = gen("div").class("tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
     const quality_selector = gen("ul").attr("id", "quality_selector")
     option_generator(unique_id[1], quality_selector, quality_opts, (e) => { quality_val = e })
 
-    const codec = gen("div").attr("class", "tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
+    const codec = gen("div").class("tabs is-toggle is-centered is-fullwidth mt-4 mb-4")
     let codec_selector = gen("ul").attr("id", "codec_selector")
     option_generator(unique_id[1], codec_selector, codec_opts, (e) => { codec_val = e })
 
-    const filestyle = gen("div").attr("class", "tabs is-small is-toggle is-centered is-fullwidth mt-4 mb-4")
+    const filestyle = gen("div").class("tabs is-small is-toggle is-centered is-fullwidth mt-4 mb-4")
     const filestyle_selector = gen("ul").attr("id", "filestyle_selector")
     option_generator(unique_id[1], filestyle_selector, filestyle_opts, (e) => { filestyle_val = e })
 
     const dub_l = gen("label")
-        .attr("class", "is-size-7")
+        .class("is-size-7")
         .inner(` Dub-Audio (Browser language)`)
     const dub_selector = gen("input").attr("type", "checkbox")
     dub_l.prepend(dub_selector)
     const dub = gen("div")
-        .attr("class", "card p-2 mb-1")
-        .attr("style", "display: inline-block; width: auto; max - width: 100 %; position: relative")
+        .class("card p-2 mb-1")
+        .sty("display: inline-block; width: auto; max - width: 100 %; position: relative")
     dub.appendChild(dub_l)
 
     const metadata_l = gen("label")
-        .attr("class", "is-size-7")
+        .class("is-size-7")
         .inner(` Disable metadata`)
     const metadata_selector = gen("input").attr("type", "checkbox")
     metadata_l.prepend(metadata_selector)
     const metadata = gen("div")
-        .attr("class", "card p-2 mt-0")
-        .attr("style", "display: inline-block; width: auto; max - width: 100 %; ")
+        .class("card p-2 mt-0")
+        .sty("display: inline-block; width: auto; max - width: 100 %; ")
     metadata.appendChild(metadata_l)
     //opts
 
     const footer = gen("footer")
     let download_btn = gen("a")
         .attr("id", `download_btn${unique_id[1]}`)
-        .attr("class", "button is-primary is-dark")
+        .class("button is-primary is-dark")
         .inner("generate")
 
     // append stuffs

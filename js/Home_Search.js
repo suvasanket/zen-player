@@ -4,13 +4,13 @@ import {
     yt_domain,
     piped_domain,
     piped_api,
-    getTheme,
     modal_detector_loader,
     stringLimit,
     timeFormat,
     numberFormat,
     getUrl,
-    ifDep
+    spinnerToggle,
+    notification
 } from "./helper.js"
 
 let NextPageUrl = "";
@@ -28,43 +28,43 @@ function grid_loader(e) {
     const type = e.type
 
     const cell = gen("div")
-        .attr("class", "cell")
+        .class("cell")
 
     const card = gen("div")
-        .attr("class", "card");
+        .class("card");
 
     const card_image = gen("div")
-        .attr("class", "card-image");
+        .class("card-image");
 
     const figure = gen("figure")
-        .attr("class", "image is-16by9")
-        .attr("style", "overflow: hidden;")
+        .class("image is-16by9")
+        .sty("overflow: hidden;")
 
     const img = gen("img")
         .attr("id", "thumbnail")
-        .attr("style", "object-fit: cover; object-position: center; width: 100%; height: 100%;")
+        .sty("object-fit: cover; object-position: center; width: 100%; height: 100%;")
 
     const footer = gen("div")
-        .attr("class", "m-2 pb-2")
-        .attr("style", "display: flex; align-items: center")
+        .class("m-2 pb-2")
+        .sty("display: flex; align-items: center")
 
     const subtitle = gen("span")
-        .attr("class", "is-size-7 has-text-weight-normal")
+        .class("is-size-7 has-text-weight-normal")
 
     const title_subtitle = gen("div")
-        .attr("style", "line-height: 1;")
+        .sty("line-height: 1;")
 
     const duration = gen("div")
-        .attr("class", "duration");
+        .class("duration");
 
     const corner_icon = gen("div")
-        .attr("class", "icon-container")
+        .class("icon-container")
 
     const corner_img = gen("img")
-        .attr("style", "height: 24px; width: 24px;")
+        .sty("height: 24px; width: 24px;")
 
     const corner_content = gen("div")
-        .attr("class", "hover-content")
+        .class("hover-content")
 
     const video_opener = gen("a")
     // show accroding to type
@@ -81,11 +81,11 @@ function grid_loader(e) {
         video_opener.setAttribute("href", v_url + 0);
 
         const channel_opener = gen("a")
-            .attr("style", "display: flex; align-items: center; margin-right: 7px;")
+            .sty("display: flex; align-items: center; margin-right: 7px;")
             .attr("href", piped_domain + e.uploaderUrl);
 
         const title = gen("span")
-            .attr("class", "is-size-7 has-text-weight-bold")
+            .class("is-size-7 has-text-weight-bold")
             .inner(`${e.title}`)
         //.inner(`${stringLimit(e.title, 37)}`)
 
@@ -97,7 +97,7 @@ function grid_loader(e) {
         }
 
         const channel_logo = gen("img")
-            .attr("style", "height: 24px; width: 24px; margin-right: 7px;")
+            .sty("height: 24px; width: 24px; margin-right: 7px;")
         channel_logo.src = e.uploaderAvatar
         channel_logo.alt = e.uploaderName
 
@@ -168,84 +168,81 @@ function grid_loader(e) {
     columns.appendChild(cell);
 }
 
-function spiner_start() {
-    if (!document.getElementById("spiner")) {
-        const spiner_fg = getTheme() === "dark" ? "white" : "black"
-        const spin_container = gen("div")
-            .attr("class", "container is-flex is-justify-content-center is-align-items-center")
-            .attr("id", "spiner")
-            .attr("style", "height: 200px;")
-        const spin_button = gen("button")
-            .attr("class", "button is-large is-loading ")
-            .attr("style", `border: none; background: transparent; box-shadow: none; color: ${spiner_fg}`)
-        spin_container.appendChild(spin_button)
-        container.prepend(spin_container)
-    }
-}
-function spiner_stop() {
-    if (document.getElementById("spiner")) {
-        document.querySelector("#spiner").remove()
-    }
-}
-
 document.addEventListener("SearchSubmit", e => {
     e.preventDefault();
 
     totalNumberOfVideos = []
 })
 
-export async function piped_fetch(query, nextPageUrl, filter = "videos") {
-    let url = query == null ? `${piped_api}trending?region=IN` : `${piped_api}search?q=${query}&filter=${filter}`
+async function piped_fetch(query, nextPageUrl, filter = "videos") {
+    let currentindex = 0
+    if (query && !nextPageUrl)
+        spinnerToggle(container)
 
-    if (nextPageUrl !== undefined) {
-        url = `${piped_api}nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
-    }
-    else {
-        spiner_start()
-    }
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        if (document.querySelector("#spiner")) spiner_stop()
-        if (!ifDep())
-            console.log(data)
-
-        if (data.items) {
-            data.items.forEach((e, index) => grid_loader(e, index))
-        } else if (data.error) {
-            console.error(data.error);
-            const notify = document.createElement("p")
-            notify.innerHTML = data.message
-            container.appendChild(notify)
-            return;
-        } else {
-            data.forEach((e, index) => grid_loader(e, index))
-        }
-
-        // Got the next page URL
-        NextPageUrl = data.nextpage;
-        if (NextPageUrl) {
-            // if less than 20 results then do a nextpage reload
-            const total = totalNumberOfVideos.reduce((prev, cur) => prev + cur, 0)
-            if (total < 30) {
-                piped_fetch(query, NextPageUrl)
-                const len = data.items.length || data.length
-                totalNumberOfVideos.push(len)
+    while (currentindex < piped_api.length) {
+        let url = new URL(`${piped_api[currentindex]}`)
+        try {
+            if (query)
+                url = `${url}/search?q=${query}&filter=${filter}`
+            else {
+                spinnerToggle(container)
+                url = `${url}/trending?region=IN`
             }
-            window.addEventListener('scroll', function() {
-                const scrollPosition = window.innerHeight + window.scrollY;
-                const bodyHeight = document.body.offsetHeight;
 
-                if (scrollPosition >= bodyHeight - 5 && !isAtBottom) {
-                    isAtBottom = true;
-                    piped_fetch(query, NextPageUrl);
-                } else if (scrollPosition < bodyHeight - 5) {
-                    isAtBottom = false;
-                }
-            });
+            if (nextPageUrl)
+                url = `${url}/nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
+
+            const response = await fetch(url, { signal: AbortSignal.timeout(4000) });
+            if (response.ok) {
+                spinnerToggle(container)
+                return response.json();
+            }
+            else {
+                currentindex++
+            }
+
+            return
+        } catch (err) {
+            currentindex++
         }
-        modal_detector_loader()
-    } catch (err) {
-        console.log(err);
     }
+    notification(
+        `All the available instances are exhuasted<br>Try later 😢`,
+        'is-danger',
+        3000
+    )
+    return
+}
+
+export async function SearchLoad(query, nextPageUrl, filter) {
+    const data = await piped_fetch(query, nextPageUrl, filter)
+
+    if (data && data.items) {
+        data.items.forEach((e, index) => grid_loader(e, index))
+    } else {
+        data.forEach((e, index) => grid_loader(e, index))
+    }
+
+    NextPageUrl = data.nextpage;
+    if (NextPageUrl) {
+        // if less than 20 results then do a nextpage reload
+        const total = totalNumberOfVideos.reduce((prev, cur) => prev + cur, 0)
+        if (total < 30) {
+            SearchLoad(query, NextPageUrl)
+            const len = data.items.length || data.length
+            totalNumberOfVideos.push(len)
+        }
+        window.addEventListener('scroll', function() {
+            const scrollPosition = window.innerHeight + window.scrollY;
+            const bodyHeight = document.body.offsetHeight;
+
+            if (scrollPosition >= bodyHeight - 5 && !isAtBottom) {
+                isAtBottom = true;
+                SearchLoad(query, NextPageUrl);
+            } else if (scrollPosition < bodyHeight - 5) {
+                isAtBottom = false;
+            }
+        });
+    }
+    modal_detector_loader()
 }

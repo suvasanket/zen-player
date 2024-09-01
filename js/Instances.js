@@ -34,11 +34,13 @@ function sort(arr) {
 async function InstanceGenerator(endpoint) {
     try {
         const response = await fetch(endpoint)
-        const data = await response.json()
-        const usable = data.filter(e => e[1].api && e[1].monitor && !e[1].monitor.down)
+        if (response.ok) {
+            const data = await response.json()
+            const usable = data.filter(e => e[1].api && e[1].monitor && !e[1].monitor.down)
 
-        const sorted = sort(uptimeUrlSplitter(usable))
-        return sorted.map(e => e.url)
+            const sorted = sort(uptimeUrlSplitter(usable))
+            return sorted.map(e => e.url)
+        }
     }
     catch (e) {
         console.log(e)
@@ -54,7 +56,7 @@ export async function LoadApi() {
 }
 
 export function GetApi() {
-    if (!api){
+    if (!api) {
         const storedApi = localStorage.getItem("api")
         if (storedApi)
             api = JSON.parse(storedApi)

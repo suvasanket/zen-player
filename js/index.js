@@ -1,4 +1,4 @@
-import { piped_fetch } from "./Home_Search.js"
+import { SearchLoad } from "./Home_Search.js"
 import { LoadApi } from "./Instances.js"
 import {
     modal_detector_loader,
@@ -20,6 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     modal_detector_loader()
     notification_detector_loader()
 
-    piped_fetch(query)
+    SearchLoad(query)
     unhandeledRejection()
 })

@@ -1,16 +1,15 @@
 const gh_domain = "suvasanket.github.io"
 
-const individous_instance = [
-    "https://yewtu.be",
-    "https://iv.ggtyler.dev",
-    "https://invidious.perennialte.ch",
-]
 export const yt_domain = "https://www.youtube.com"
 export const piped_domain = 'https://piped.video'
-export const invidious_domain = individous_instance[0]
 
 export const cobalt_api = "https://api.cobalt.tools/api/json"
-export const piped_api = 'https://pipedapi.kavin.rocks/'
+export const piped_api = [
+    'https://pipedapi.kavin.rocks',
+    'https://pipedapi.r4fo.com',
+    'https://api.piped.yt',
+    'https://pipedapi-libre.kavin.rocks',
+]
 
 export function modal_detector_loader() {
     function openModal($el) {
@@ -82,6 +81,14 @@ export function gen(tag) {
         this.setAttribute(attr, val)
         return this
     }
+    element.class = function(val) {
+        this.setAttribute("class", val)
+        return this
+    }
+    element.sty = function(val) {
+        this.setAttribute("style", val)
+        return this
+    }
     element.inner = function(val) {
         this.innerHTML = val
         return this
@@ -96,8 +103,8 @@ export function notification(content, Class, duration) {
         document.body.appendChild(notification_center)
     }
 
-    const notification = gen("div").attr("class", `notification is-family-monospace is-${getTheme()} ` + Class)
-    const botton = gen("button").attr("class", "delete")
+    const notification = gen("div").class(`notification is-family-monospace is-${getTheme()} ` + Class)
+    const botton = gen("button").class("delete")
     const cont = gen("p")
     cont.innerHTML = content
     notification.appendChild(botton)
@@ -190,9 +197,26 @@ Source: "https://github.com/suvasanket/zen-player"
 export function unhandeledRejection() {
     window.addEventListener('unhandledrejection', event => {
         notification(
-            `${event.reason}<br>God: If you can fix it, open the console`,
+            `something went wrong!`,
             `is-danger`,
             100000
         )
     })
+}
+
+export function spinnerToggle(parent) {
+    const spinner = parent.querySelector(".spinner")
+    if (!spinner) {
+        const spinner = gen("div").class("spinner")
+        parent.appendChild(spinner)
+    }
+    else {
+        spinner.remove()
+    }
+}
+export function spinnerStop(parent) {
+    const spinner = parent.querySelector('.spinner');
+    if (spinner){
+        spinner.remove()
+    }
 }
