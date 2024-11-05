@@ -4,12 +4,22 @@ export const yt_domain = "https://www.youtube.com"
 export const piped_domain = 'https://piped.video'
 
 export const cobalt_api = "https://api.cobalt.tools/api/json"
+//export const piped_api = 'https://pipedapi.kavin.rocks/'
 export const piped_api = [
     'https://pipedapi.kavin.rocks',
-    'https://pipedapi.r4fo.com',
     'https://api.piped.yt',
     'https://pipedapi-libre.kavin.rocks',
+    'https://pipedapi.r4fo.com',
+    'https://piped-api.lunar.icu',
 ]
+export const timeoutlen = 5000
+export const ifDep = () => window.location.hostname === gh_domain
+export function ifOnline(callback) {
+    if (window.navigator.onLine)
+        callback()
+    else
+        notification(`No Internet Connection available 😭`, `is-danger`, 5000)
+}
 
 export function modal_detector_loader() {
     function openModal($el) {
@@ -171,8 +181,6 @@ export function getUrl(src) {
     return src
 }
 
-export const ifDep = () => window.location.hostname === gh_domain
-
 export function printSourceLink() {
     if (ifDep())
         console.log(`
@@ -195,11 +203,11 @@ Source: "https://github.com/suvasanket/zen-player"
 }
 
 export function unhandeledRejection() {
-    window.addEventListener('unhandledrejection', event => {
+    window.addEventListener('unhandledrejection', () => {
         notification(
             `something went wrong!`,
             `is-danger`,
-            100000
+            10000
         )
     })
 }
@@ -219,4 +227,15 @@ export function spinnerStop(parent) {
     if (spinner){
         spinner.remove()
     }
+}
+export function getInternetSpeed(start, end) {
+    const size = 62475 //error : 1039 ok : 62475
+
+    const durationSec = (end - start) / 1000
+    const loadedBits = size * 8
+    const inBps = (loadedBits / durationSec).toFixed(2)
+    const inKbps = (inBps / 1024).toFixed(2)
+    const inMbps = (inKbps / 1024).toFixed(2)
+
+    fetchingSpeed = inMbps
 }
