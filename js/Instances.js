@@ -73,11 +73,13 @@ async function InstanceGenerator(endpoint) {
         console.log(e)
     }
 }
+
+let api = null
 export async function LoadApi() {
     if (!sessionStorage.getItem('hasRun')) {
         let stored_endpoints
         try {
-            stored_endpoints = JSON.parse(localStorage.getItem("local_endpoint"))
+            stored_endpoints = CookieGetItem('endpoint_urls')
         } catch (e) {
             stored_endpoints = []
         }
@@ -85,36 +87,39 @@ export async function LoadApi() {
         const res_endpoints = await InstanceGenerator(endpoint)
         const merged = [...new Set([...stored_endpoints, ...res_endpoints])]
 
+        const days = 7
         if (merged) {
-            localStorage.setItem("local_endpoint", JSON.stringify(merged))
+            CookieSetItem('endpoint_urls', merged, (days * 24 * 60 * 60 * 1000))
+            api = merged
         }
     }
     sessionStorage.setItem("hasRun", true)
 }
 
-let api = null
 export function GetApi() {
-    if (!api) {
-        const storedApi = localStorage.getItem("local_endpoint")
-        if (storedApi)
-            api = JSON.parse(storedApi)
-    }
-    return api
+    const endpoint_urls = CookieGetItem('endpoint_urls')
+    if (!endpoint_urls) return api
+    return endpoint_urls
 }
 
 export function pushEndPoint(url) {
-    const optimalApi = JSON.parse(localStorage.getItem("local_endpoint"))
-    localStorage.setItem(
-        "local_endpoint",
-        JSON.stringify([...new Set([url, ...optimalApi])])
-    )
+    const optimalApi = CookieGetItem('endpoint_urls')
+    CookieSetItem('endpoint_urls', [...new Set([url, ...optimalApi])], (7 * 24 * 60 * 60 * 1000))
 }
 
-export function removeEndPoint(url) {
-    const optimalApi = JSON.parse(localStorage.getItem("local_endpoint"))
-    optimalApi.splice(optimalApi.indexOf(url), 1)
-    localStorage.setItem(
-        "local_endpoint",
-        optimalApi
-    )
+function CookieSetItem(name, value, time) {
+    const date = new Date
+    date.setTime(date.getTime() + time)
+    const expires = `expires=${date.toUTCString()}`
+    document.cookie = `${name}=${JSON.stringify(value)}; ${expires}; path=/;`
+}
+
+function CookieGetItem(name) {
+    const value = `; ${document.cookie}`
+    const parts = value.split(`; ${name}=`)
+
+    if (parts.length === 2)
+        return JSON.parse(parts.pop().split(';').shift())
+    else
+        return null
 }

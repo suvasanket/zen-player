@@ -6,7 +6,7 @@ import {
     gen,
     spinnerToggle,
 } from './helper.js'
-import { pushEndPoint, removeEndPoint } from './Instances.js'
+import { pushEndPoint } from './Instances.js'
 
 const source = 'piped'
 export const video = videojs('video-player', {

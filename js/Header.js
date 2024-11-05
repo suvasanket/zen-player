@@ -7,7 +7,7 @@ function randomLogo() {
     randomIndex++
 
     const header_logo = finder("#header-logo")
-    header_logo.src = `./assets/logo${randomIndex}.png`
+    header_logo.src = `./assets/logo${randomIndex}.webp`
     header_logo.loading = 'lazy'
     header_logo.onload = () => {
         const preloadImage = new Image()
