@@ -162,20 +162,25 @@ function PlayVideo(video_res, default_quality) {
         requestAnimationFrame(syncAudioVideo)
     }
 
-    video.on('play', () => syncAudioVideo())
-    video.on('pause', () => {
-        video.pause()
-        audio.pause()
+    video.on('canplay', () => {
+        video.play()
+        audio.play()
+        syncAudioVideo()
     })
+    video.on('play', () => syncAudioVideo())
+    video.on('pause', () => audio.pause())
+    video.on('progress', () => syncAudioVideo())
     video.on('seeking', () => (audio.currentTime = video.currentTime()))
-    video.on('timeupdate', syncAudioVideo)
     video.on('loadstart', () => audio.pause())
+    video.on('waiting', () => audio.pause())
+    video.on('timeupdate', syncAudioVideo)
     video.on('volumechange', () => (audio.volume = video.volume()))
     video.on('playing', () => {
         audio.play()
         syncAudioVideo()
     })
     video.on('qualitySelected', () => (audio.currentTime = video.currentTime()))
+
     let retries = 0
     video.on('error', function() {
         const error = video.error()
@@ -189,10 +194,6 @@ function PlayVideo(video_res, default_quality) {
             }
         }
     })
-        ; (() => {
-            video.play()
-            syncAudioVideo()
-        })()
 }
 
 const removeSkele = (element) => element.classList.remove('has-skeleton')
