@@ -4,13 +4,15 @@ export const yt_domain = "https://www.youtube.com"
 export const piped_domain = 'https://piped.video'
 
 export const cobalt_api = "https://api.cobalt.tools/api/json"
-//export const piped_api = 'https://pipedapi.kavin.rocks/'
 export const piped_api = [
     'https://pipedapi.kavin.rocks',
     'https://api.piped.yt',
     'https://pipedapi-libre.kavin.rocks',
     'https://pipedapi.r4fo.com',
     'https://piped-api.lunar.icu',
+]
+export const invidious_api = [
+    'https://invidious.nerdvpn.de'
 ]
 export const timeoutlen = 5000
 export const ifDep = () => window.location.hostname === gh_domain
@@ -224,7 +226,7 @@ export function spinnerToggle(parent) {
 }
 export function spinnerStop(parent) {
     const spinner = parent.querySelector('.spinner');
-    if (spinner){
+    if (spinner) {
         spinner.remove()
     }
 }
@@ -238,4 +240,19 @@ export function getInternetSpeed(start, end) {
     const inMbps = (inKbps / 1024).toFixed(2)
 
     fetchingSpeed = inMbps
+}
+export function detectSpeed(start, end, size) {
+    if (!size) size = 62475 //error : 1039 ok : 62475
+    //const data = await response.clone().text(); // Read data to ensure full fetch
+    //const dataSize = new TextEncoder().encode(data).length; // Get data size in bytes
+
+    const durationSec = (end - start) / 1000
+    const loadedBits = size * 8
+    const inBps = (loadedBits / durationSec).toFixed(2)
+    const inKbps = (inBps / 1024).toFixed(2)
+    const inMbps = (inKbps / 1024).toFixed(2)
+
+    if (sessionStorage.getItem('initialInternetSpeed') === null)
+        sessionStorage.setItem('initialInternetSpeed', String(inMbps))
+    return inMbps
 }

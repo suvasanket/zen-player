@@ -10,7 +10,8 @@ import {
     numberFormat,
     getUrl,
     spinnerToggle,
-    notification
+    notification,
+    invidious_api
 } from "./helper.js"
 
 let NextPageUrl = "";
@@ -23,8 +24,18 @@ let isAtBottom = false;
 const quality = ['lowest', 'highest']
 quality.push('Download')
 
+function thumbnailQuality(speed) {
+    if (sessionStorage.getItem('thumbnailFetchingSpeed') !== null)
+        speed = sessionStorage.getItem('thumbnailFetchingSpeed')
+    if (speed <= 0.5) return 'default'
+    else if (0.5 < speed < 2) return 'mqdefault'
+    else if (speed > 2) return 'hqdefault'
+    else return '1'
+}
+
+
 // it takes each element and then append them to the main columns
-function grid_loader(e) {
+function grid_loader(e, speed) {
     const type = e.type
 
     const cell = gen("div")
@@ -101,7 +112,8 @@ function grid_loader(e) {
         channel_logo.src = e.uploaderAvatar
         channel_logo.alt = e.uploaderName
 
-        img.src = e.thumbnail;
+        //img.src = e.thumbnail;
+        img.src = `${invidious_api[0]}/vi/${e.url.match(/(?<==).*/)}/${thumbnailQuality(speed)}.jpg`
 
         duration.innerHTML = timeFormat(e.duration);
 
@@ -174,28 +186,52 @@ document.addEventListener("SearchSubmit", e => {
     totalNumberOfVideos = []
 })
 
+function detectSpeed(start, end, size) {
+    const durationSec = (end - start) / 1000
+    const loadedBits = size * 8
+    const inBps = (loadedBits / durationSec).toFixed(2)
+    const inKbps = (inBps / 1024).toFixed(2)
+    const inMbps = (inKbps / 1024).toFixed(2)
+
+    //const storedSpeed = sessionStorage.getItem('thumbnailFetchingSpeed');
+    //if (storedSpeed === null)
+    //    sessionStorage.setItem('thumbnailFetchingSpeed', String(inMbps))
+    //
+    //if (storedSpeed !== null)
+    //    return storedSpeed
+    return inMbps
+}
+
 async function piped_fetch(query, nextPageUrl, filter = "videos") {
     let currentindex = 0
     if (query && !nextPageUrl)
         spinnerToggle(container)
 
     while (currentindex < piped_api.length) {
-        let url = new URL(`${piped_api[currentindex]}`)
+        const endpoint = new URL(`${piped_api[currentindex]}`)
+        let url = ""
         try {
             if (query)
-                url = `${url}/search?q=${query}&filter=${filter}`
+                url = `${endpoint}/search?q=${query}&filter=${filter}`
             else {
                 spinnerToggle(container)
-                url = `${url}/trending?region=IN`
+                url = `${endpoint}/trending?region=IN`
             }
 
             if (nextPageUrl)
-                url = `${url}/nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
+                url = `${endpoint}/nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
 
+            console.log(url)
+            const beforeFetch = new Date().getTime()
             const response = await fetch(url, { signal: AbortSignal.timeout(4000) });
+            const afterFetch = new Date().getTime()
+
             if (response.ok) {
                 spinnerToggle(container)
-                return response.json();
+                const data = await response.clone().json()
+                const dataSize = new TextEncoder().encode(data).length
+                const speed = detectSpeed(beforeFetch, afterFetch, dataSize)
+                return { data, speed }
             }
             else {
                 currentindex++
@@ -215,12 +251,13 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
 }
 
 export async function SearchLoad(query, nextPageUrl, filter) {
-    const data = await piped_fetch(query, nextPageUrl, filter)
+    const { data, speed } = await piped_fetch(query, nextPageUrl, filter)
+    console.log(data)
 
     if (data && data.items) {
-        data.items.forEach((e, index) => grid_loader(e, index))
+        data.items.forEach(e => grid_loader(e, speed))
     } else {
-        data.forEach((e, index) => grid_loader(e, index))
+        data.forEach(e => grid_loader(e, speed))
     }
 
     NextPageUrl = data.nextpage;
