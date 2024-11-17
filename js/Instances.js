@@ -1,14 +1,21 @@
 const invidious_endpoint = "https://api.invidious.io/instances.json?pretty=1&sort_by=type,users"
 const piped_endpoint = "https://raw.githubusercontent.com/TeamPiped/piped-uptime/master/README.md"
 
-const source = "piped"
+const priority = "in" // "in" / "pi"
 
-let endpoint
-if (source === "piped")
-    endpoint = piped_endpoint
-else
-    endpoint = invidious_endpoint
-
+async function getAllEndpoints(first) {
+    let second = "pi"
+    let first_endpoint = invidious_endpoint
+    let second_endpoint = piped_endpoint
+    if (first === "pi") {
+        first_endpoint = piped_endpoint
+        second = "in"
+        second_endpoint = invidious_endpoint
+    }
+    const first_res = await InstanceGenerator(first_endpoint, first)
+    const second_res = await InstanceGenerator(second_endpoint, second)
+    return [...first_res, ...second_res]
+}
 
 function uptimeUrlSplitter(usable) {
     let res = []
@@ -43,13 +50,13 @@ function sort(arr) {
     return [...leftSort, pivot, ...rightSort]
 }
 
-async function InstanceGenerator(endpoint) {
+async function InstanceGenerator(endpoint, source) {
     try {
         const response = await fetch(endpoint)
         if (!response.ok)
             return
 
-        if (source === "piped") {
+        if (source === "pi") {
             const data = await response.text()
             const only_yes = /.*\bUp\b.*/gm;
             const match = data.match(only_yes)
@@ -62,7 +69,7 @@ async function InstanceGenerator(endpoint) {
             })
             return instances
         }
-        else {
+        else if (source === "in") {
             const data = await response.json()
             const usable = data.filter(e => e[1].api && e[1].monitor && !e[1].monitor.down)
             const sorted = sort(uptimeUrlSplitter(usable))
@@ -76,24 +83,23 @@ async function InstanceGenerator(endpoint) {
 
 let api = null
 export async function LoadApi() {
-    if (!sessionStorage.getItem('hasRun')) {
-        let stored_endpoints
-        try {
-            stored_endpoints = CookieGetItem('endpoint_urls')
-        } catch (e) {
-            stored_endpoints = []
-        }
-        stored_endpoints = stored_endpoints === null ? [] : stored_endpoints
-        const res_endpoints = await InstanceGenerator(endpoint)
-        const merged = [...new Set([...stored_endpoints, ...res_endpoints])]
-
-        const days = 7
-        if (merged) {
-            CookieSetItem('endpoint_urls', merged, (days * 24 * 60 * 60 * 1000))
-            api = merged
-        }
+    let stored_endpoints
+    try {
+        stored_endpoints = CookieGetItem('endpoint_urls')
+    } catch (e) {
+        stored_endpoints = []
     }
-    sessionStorage.setItem("hasRun", true)
+    stored_endpoints = stored_endpoints === null ? [] : stored_endpoints
+    //const res_endpoints = await InstanceGenerator(piped_endpoint, "pi")
+    const res_endpoints = await getAllEndpoints(priority)
+    console.log(res_endpoints)
+    const merged = [...new Set([...stored_endpoints, ...res_endpoints])]
+
+    const days = 7
+    if (merged) {
+        CookieSetItem('endpoint_urls', merged, (days * 24 * 60 * 60 * 1000))
+        api = merged
+    }
 }
 
 export function GetApi() {
@@ -107,14 +113,14 @@ export function pushEndPoint(url) {
     CookieSetItem('endpoint_urls', [...new Set([url, ...optimalApi])], (7 * 24 * 60 * 60 * 1000))
 }
 
-function CookieSetItem(name, value, time) {
+export function CookieSetItem(name, value, time) {
     const date = new Date
     date.setTime(date.getTime() + time)
     const expires = `expires=${date.toUTCString()}`
     document.cookie = `${name}=${JSON.stringify(value)}; ${expires}; path=/;`
 }
 
-function CookieGetItem(name) {
+export function CookieGetItem(name) {
     const value = `; ${document.cookie}`
     const parts = value.split(`; ${name}=`)
 

@@ -147,6 +147,19 @@
         </div>
       </div>
 
+      <div class="modal" id="fetchingProgressModal">
+        <div class="modal-background"></div>
+          <div class="modal-content">
+            <!-- Progress Bar -->
+            <p class="title is-4">Getting content</p>
+            <p class="subtitle is-6 mt-3">
+            The bar represent how many potential server available to fetch the video. So progress mean its not good.<br>
+            </p>
+            <progress class="progress is-danger is-small mt-3" max="100" id="fetchingProgressModalProgress"></progress>
+          </div>
+          <!--<button class="button m-6">Update server list</button>-->
+      </div>
+
       <script src="js/helper.js" type="module"></script>
       <script src="js/Watch.js" type="module"></script>
       <script src="js/index_watch.js" type="module"></script>

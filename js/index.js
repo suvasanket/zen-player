@@ -1,5 +1,5 @@
 import { SearchLoad } from "./Home_Search.js"
-import { GetApi, LoadApi } from "./Instances.js"
+import { GetApi, LoadApi, CookieGetItem } from "./Instances.js"
 import {
     modal_detector_loader,
     notification_detector_loader,
@@ -16,8 +16,9 @@ if (query) {
 
 document.addEventListener('DOMContentLoaded', () => {
     printSourceLink()
-    LoadApi()
-    console.log(GetApi())
+    if (CookieGetItem('endpoint_urls') === null)
+        LoadApi()
+    //console.log(GetApi())
 
     modal_detector_loader()
     notification_detector_loader()

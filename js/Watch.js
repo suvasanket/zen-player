@@ -6,9 +6,8 @@ import {
     gen,
     spinnerToggle,
 } from './helper.js'
-import { pushEndPoint } from './Instances.js'
+import { LoadApi, pushEndPoint } from './Instances.js'
 
-const source = 'piped'
 export const video = videojs('video-player', {
     controlBar: {
         children: [
@@ -93,10 +92,10 @@ function qualityExtract(arr, def) {
     return res
 }
 
-function playVideo_sourceDefiner(video_res) {
+function video_audioSplit(video_res) {
     let audio_arr, video_arr
 
-    if (source === 'piped') {
+    if (video_res.audioStreams || video_res.audioStreams) {
         audio_arr = video_res.audioStreams
         video_arr = video_res.videoStreams
     } else {
@@ -143,7 +142,7 @@ function getDefaultQuality(def, arr) {
 
 function PlayVideo(video_res, default_quality) {
     video.removeClass('vjs-waiting')
-    const { player_aud, player_vid } = playVideo_sourceDefiner(video_res)
+    const { player_aud, player_vid } = video_audioSplit(video_res)
 
     let audio = new Audio(player_aud[0].url)
     const videoSrc = qualityExtract(player_vid, default_quality)
@@ -162,12 +161,7 @@ function PlayVideo(video_res, default_quality) {
         requestAnimationFrame(syncAudioVideo)
     }
 
-    video.on('canplay', () => {
-        video.play()
-        audio.play()
-        syncAudioVideo()
-    })
-    video.on('play', () => syncAudioVideo())
+    video.on('play', () => audio.play())
     video.on('pause', () => audio.pause())
     video.on('progress', () => syncAudioVideo())
     video.on('seeking', () => (audio.currentTime = video.currentTime()))
@@ -180,24 +174,15 @@ function PlayVideo(video_res, default_quality) {
         syncAudioVideo()
     })
     video.on('qualitySelected', () => (audio.currentTime = video.currentTime()))
-
-    let retries = 0
-    video.on('error', function() {
-        const error = video.error()
-        while (retries < 3) {
-            if (error && error.code === 4) {
-                notification(`Retrying please wait...`, `is-warning`, 2000)
-                setTimeout(() => {
-                    video.load()
-                    retries++
-                }, 3000)
-            }
-        }
+    video.on('canplay', () => {
+        video.play()
+        audio.play()
+        syncAudioVideo()
     })
 }
 
 const removeSkele = (element) => element.classList.remove('has-skeleton')
-function BottomLayoutGen(data, dis_data, vid) {
+function BottomLayoutGen(data, vid) {
     const title = document.querySelector('#title')
     removeSkele(title)
     title.innerHTML = data.title
@@ -205,23 +190,23 @@ function BottomLayoutGen(data, dis_data, vid) {
     const views_time = document.querySelector('#views-timeago')
     removeSkele(views_time)
     views_time.innerHTML =
-        numberFormat(data.viewCount) + ' views • ' + data.publishedText
+        numberFormat(data.viewCount || data.views) + ' views • ' + data.publishedText
 
     // nav left elements
     const channel_logo_img = document.querySelector('#channel-logo-img')
     removeSkele(channel_logo_img)
-    channel_logo_img.src = data.authorThumbnails[2].url
+    channel_logo_img.src = data.uploaderAvatar || data.authorThumbnails[2].url
 
     const channel_name = document.querySelector('#channel-name')
     removeSkele(channel_name)
-    channel_name.innerHTML = data.author
+    channel_name.innerHTML = data.author || data.uploader
 
     const subs = document.querySelector('#subs')
     removeSkele(subs)
-    subs.innerHTML = data.subCountText + ' subscribers'
+    subs.innerHTML = (data.subCountText || numberFormat(data.uploaderSubscriberCount)) + ' subscribers'
 
     const description = document.querySelector('#description')
-    const formatted = data.descriptionHtml.replace(/\n/g, '<br>')
+    const formatted = (data.descriptionHtml || data.description).replace(/\n/g, '<br>')
     description.insertAdjacentHTML('beforeend', formatted)
 
     title.addEventListener('click', () => {
@@ -232,13 +217,16 @@ function BottomLayoutGen(data, dis_data, vid) {
     })
 
     // nav right elements
-    const dislike_count = document.querySelector('#dislike-count')
     const like_count = document.querySelector('#like-count')
-    if (dis_data) {
-        dislike_count.innerHTML = numberFormat(dis_data.dislikes)
-        like_count.innerHTML = numberFormat(dis_data.likes)
+    like_count.innerHTML = numberFormat(data.likeCount || data.likes)
+    const dislike_count = document.querySelector('#dislike-count')
+    if (data.dislikes) {
+        dislike_count.innerHTML = numberFormat(data.dislikes)
     } else {
-        like_count.innerHTML = numberFormat(data.likeCount)
+        dislikeFetch(vid).then(e => {
+            if (e)
+                dislike_count.innerHTML = numberFormat(e.dislikes)
+        })
     }
     const youtube_link = document.querySelector('#youtube-link')
     youtube_link.href = `${yt_domain}/watch?v=${vid}`
@@ -370,6 +358,34 @@ function detectSpeed(start, end) {
         sessionStorage.setItem('fetchingSpeed', String(inMbps))
     fetchingSpeed = inMbps
 }
+function fetchingProgressModal(value, max) {
+    const modal = document.getElementById("fetchingProgressModal")
+    modal.classList.add("is-active")
+    const progress = document.getElementById("fetchingProgressModalProgress")
+    progress.value = String(value)
+    progress.max = String(max)
+}
+const fetchingProgressModalRemove = () => { document.getElementById("fetchingProgressModal").classList.remove('is-active') }
+function updateEndpointList(vid) {
+    const modal = document.getElementById("fetchingProgressModal")
+    const button = gen('button')
+        .class('button is-success is-light m-6')
+        .inner('update server-list')
+    const youtube = gen('a')
+        .class('button is-danger is-dark m-6')
+        .inner('open in youtube')
+    youtube.href = `${yt_domain}/watch?v=${vid}`
+    const buttons = gen('div').class('buttons')
+    buttons.appendChild(button)
+    buttons.appendChild(youtube)
+    modal.appendChild(buttons)
+    button.addEventListener('click', () => {
+        fetchingProgressModalRemove()
+        button.remove()
+        LoadApi()
+        location.reload()
+    })
+}
 
 async function videoFetch(vid, api) {
     video.addClass('vjs-waiting')
@@ -380,53 +396,49 @@ async function videoFetch(vid, api) {
             4000,
         )
 
-    const video_param = source === 'piped' ? '/streams/' : '/api/v1/videos/'
-    let currentIndex = 0
-
+    let currentIndex = 0, video_param
     while (currentIndex < api.length) {
+        const cur = api[currentIndex]
+        if (cur.includes("api"))
+            video_param = '/streams/'
+        else
+            video_param = '/api/v1/videos/'
         try {
             const beforeFetch = new Date().getTime()
-            const fetched = await fetch(api[currentIndex] + video_param + vid, {
-                signal: AbortSignal.timeout(9000),
-            })
+            const fetched = await fetch(cur + video_param + vid)
             const afterFetch = new Date().getTime()
+            console.log(fetched)
 
             if (fetched.ok) {
-                pushEndPoint(api[currentIndex])
+                pushEndPoint(cur)
                 detectSpeed(beforeFetch, afterFetch)
+                fetchingProgressModalRemove()
                 return fetched.json()
             } else {
-                data.then((e) => console.log(e))
-                notification(
-                    `server error, retrying with others<br>${currentIndex}try`,
-                    `is-warning is-size-6`,
-                    5000,
-                )
                 currentIndex++
+                fetchingProgressModal(currentIndex, api.length)
             }
         } catch (err) {
+            console.log(err)
             currentIndex++
-            notification(
-                `Error fetching,<br>Dont't worry we have other servers<br>Attempt: ${currentIndex}`,
-                `is-warning is-size-6`,
-                5000,
-            )
+            fetchingProgressModal(currentIndex, api.length)
         }
     }
 
-    notification(
-        `All server are exhausted, Please try again later`,
-        `is-danger`,
-        7000,
-    )
+    updateEndpointList(vid)
     return
 }
 
 async function dislikeFetch(vid) {
-    const fetched_dislike = await fetch(
-        `https://returnyoutubedislikeapi.com/votes?videoId=${vid}`,
-    )
-    return fetched_dislike.json()
+    try {
+        const fetched_dislike = await fetch(
+            `https://returnyoutubedislikeapi.com/votes?videoId=${vid}`,
+        )
+        return fetched_dislike.json()
+    }
+    catch (err) {
+        notification(`Error getting dislikes`, `is-warning`, 1000)
+    }
 }
 
 async function commentsFetch(
@@ -568,28 +580,28 @@ export async function watch(v_id, api) {
     //const comment_res = await commentsFetch(vid, api)
 
     if (!ifDep()) {
-        //console.log(video_res)
+        console.log(video_res)
         //console.log(fetchingSpeed)
     }
 
     if (video_res) {
         document.title = video_res.title
+        //try {
+        //    PlayVideo(video_res, def_quality)
+        //    ret()
+        //} catch (err) {
+        //    console.error('Error Playing Video: ', err)
+        //    ret()
+        //}
+
         try {
-            PlayVideo(video_res, def_quality)
-            ret()
-        } catch (err) {
-            console.error('Error Playing Video: ', err)
+            BottomLayoutGen(video_res, v_id)
             ret()
         }
-
-        //try {
-        //    BottomLayoutGen(video_res, dislike_res, vid)
-        //    ret()
-        //}
-        //catch (err) {
-        //    console.error("Error Bottom Layout Generation: ", err)
-        //    ret()
-        //}
+        catch (err) {
+            console.error("Error Bottom Layout Generation: ", err)
+            ret()
+        }
         //CommentSectionGen(comment_res)
         //CommentHelper(api, vid);
     }

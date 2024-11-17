@@ -112,8 +112,8 @@ function grid_loader(e, speed) {
         channel_logo.src = e.uploaderAvatar
         channel_logo.alt = e.uploaderName
 
-        //img.src = e.thumbnail;
-        img.src = `${invidious_api[0]}/vi/${e.url.match(/(?<==).*/)}/${thumbnailQuality(speed)}.jpg`
+        //img.src = e.thumbnail || `${invidious_api[0]}/vi/${e.url.match(/(?<==).*/)}/${thumbnailQuality(speed)}.jpg`
+        img.src = e.thumbnail || `${invidious_api[0]}/vi/${e.url.match(/(?<==).*/)}/default.jpg`
 
         duration.innerHTML = timeFormat(e.duration);
 
@@ -186,12 +186,16 @@ document.addEventListener("SearchSubmit", e => {
     totalNumberOfVideos = []
 })
 
-function detectSpeed(start, end, size) {
+function detectSpeed(start, end, numofvid) {
+    //15.97 hardcoded size
+    console.log(numofvid * 15.97)
+
     const durationSec = (end - start) / 1000
-    const loadedBits = size * 8
+    const loadedBits = 127.76 * numofvid
     const inBps = (loadedBits / durationSec).toFixed(2)
     const inKbps = (inBps / 1024).toFixed(2)
     const inMbps = (inKbps / 1024).toFixed(2)
+    console.log(inMbps)
 
     //const storedSpeed = sessionStorage.getItem('thumbnailFetchingSpeed');
     //if (storedSpeed === null)
@@ -208,7 +212,7 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
         spinnerToggle(container)
 
     while (currentindex < piped_api.length) {
-        const endpoint = new URL(`${piped_api[currentindex]}`)
+        const endpoint = piped_api[currentindex]
         let url = ""
         try {
             if (query)
@@ -221,7 +225,6 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
             if (nextPageUrl)
                 url = `${endpoint}/nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
 
-            console.log(url)
             const beforeFetch = new Date().getTime()
             const response = await fetch(url, { signal: AbortSignal.timeout(4000) });
             const afterFetch = new Date().getTime()
@@ -229,8 +232,7 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
             if (response.ok) {
                 spinnerToggle(container)
                 const data = await response.clone().json()
-                const dataSize = new TextEncoder().encode(data).length
-                const speed = detectSpeed(beforeFetch, afterFetch, dataSize)
+                const speed = detectSpeed(beforeFetch, afterFetch, data.length || data.items.length)
                 return { data, speed }
             }
             else {
