@@ -256,3 +256,26 @@ export function detectSpeed(start, end, size) {
         sessionStorage.setItem('initialInternetSpeed', String(inMbps))
     return inMbps
 }
+
+export function getRelativeTime(utcString) {
+    const date = new Date(utcString);
+    const diff = date - Date.now()
+    const formatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+    const units = [
+        { label: 'year', value: 1000 * 60 * 60 * 24 * 365 },
+        { label: 'month', value: 1000 * 60 * 60 * 24 * 30 },
+        { label: 'week', value: 1000 * 60 * 60 * 24 * 7 },
+        { label: 'day', value: 1000 * 60 * 60 * 24 },
+        { label: 'hour', value: 1000 * 60 * 60 },
+        { label: 'minute', value: 1000 * 60 },
+        { label: 'second', value: 1000 }
+    ];
+
+    for (const { label, value } of units) {
+        const relative = diff / value;
+        if (Math.abs(relative) >= 1) {
+            return formatter.format(Math.round(relative), label);
+        }
+    }
+    return null
+}

@@ -67,13 +67,13 @@ async function InstanceGenerator(endpoint, source) {
                 match = match.slice(1)
                 instances.push(match[0])
             })
-            return instances
+            return instances.map(e => ({ url: e, source: source }))
         }
         else if (source === "in") {
             const data = await response.json()
             const usable = data.filter(e => e[1].api && e[1].monitor && !e[1].monitor.down)
             const sorted = sort(uptimeUrlSplitter(usable))
-            return sorted.map(e => e.url)
+            return sorted.map(e => e.url).map(e => ({ url: e, source: source }))
         }
     }
     catch (e) {
@@ -110,7 +110,12 @@ export function GetApi() {
 
 export function pushEndPoint(url) {
     const optimalApi = CookieGetItem('endpoint_urls')
-    CookieSetItem('endpoint_urls', [...new Set([url, ...optimalApi])], (7 * 24 * 60 * 60 * 1000))
+    function removeduplicate(arr) {
+        return Array.from(
+            new Set(arr.map(obj => JSON.stringify(obj)))
+        ).map(str => JSON.parse(str))
+    }
+    CookieSetItem('endpoint_urls', [...removeduplicate([url, ...optimalApi])], (7 * 24 * 60 * 60 * 1000))
 }
 
 export function CookieSetItem(name, value, time) {

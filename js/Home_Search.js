@@ -188,14 +188,12 @@ document.addEventListener("SearchSubmit", e => {
 
 function detectSpeed(start, end, numofvid) {
     //15.97 hardcoded size
-    console.log(numofvid * 15.97)
 
     const durationSec = (end - start) / 1000
     const loadedBits = 127.76 * numofvid
     const inBps = (loadedBits / durationSec).toFixed(2)
     const inKbps = (inBps / 1024).toFixed(2)
     const inMbps = (inKbps / 1024).toFixed(2)
-    console.log(inMbps)
 
     //const storedSpeed = sessionStorage.getItem('thumbnailFetchingSpeed');
     //if (storedSpeed === null)
@@ -254,7 +252,6 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
 
 export async function SearchLoad(query, nextPageUrl, filter) {
     const { data, speed } = await piped_fetch(query, nextPageUrl, filter)
-    console.log(data)
 
     if (data && data.items) {
         data.items.forEach(e => grid_loader(e, speed))

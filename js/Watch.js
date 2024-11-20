@@ -5,6 +5,7 @@ import {
     yt_domain,
     gen,
     spinnerToggle,
+    getRelativeTime,
 } from './helper.js'
 import { LoadApi, pushEndPoint } from './Instances.js'
 
@@ -121,7 +122,6 @@ function getDefaultQuality(def, arr) {
 
     if (sessionStorage.getItem('fetchingSpeed') !== null)
         fetchingSpeed = Number(sessionStorage.getItem('fetchingSpeed'))
-    console.log(fetchingSpeed)
     if (def === 1 || fetchingSpeed < 0.5) return arr[0].qualityLabel || arr[0].quality
     else if (def === 2 || fetchingSpeed > 25) return arr[arr.length - 1].qualityLabel || arr[arr.length - 1].quality
     else if (fetchingSpeed < 1) quality = 240
@@ -146,7 +146,6 @@ function PlayVideo(video_res, default_quality) {
 
     let audio = new Audio(player_aud[0].url)
     const videoSrc = qualityExtract(player_vid, default_quality)
-    console.log(videoSrc)
     video.src(videoSrc)
 
     // video-audio sync
@@ -189,8 +188,9 @@ function BottomLayoutGen(data, vid) {
 
     const views_time = document.querySelector('#views-timeago')
     removeSkele(views_time)
-    views_time.innerHTML =
-        numberFormat(data.viewCount || data.views) + ' views • ' + data.publishedText
+    const time = getRelativeTime(data.uploadDate) || data.publishedText
+    const views = numberFormat(data.viewCount || data.views)
+    views_time.innerHTML = views + ' views • ' + time
 
     // nav left elements
     const channel_logo_img = document.querySelector('#channel-logo-img')
@@ -233,8 +233,8 @@ function BottomLayoutGen(data, vid) {
 }
 
 class Comment {
-    comment_box = gen('div').class('container is-fluid m-3')
-    level = gen('div').class('level')
+    comment_box = gen('div')
+    level = gen('div').class('level mt-3 mb-3')
 
     channel_logo = gen('a')
         .class('level-item')
@@ -263,13 +263,15 @@ class Comment {
         .class('fa-solid fa-thumbtack fa-xs')
         .sty('color: #B197FC;')
 
-    comment_content = gen('div').sty('word-break: break-word;')
+    comment_content = gen('div').sty('word-break: break-word; margin-right: 40%;')
 
     comment_footer = gen('span')
     replies = gen('a').class('has-text-weight-bold')
     like_icon = gen('span')
         .class('icon ml-2')
         .inner(`<i class="fa-solid fa-thumbs-up fa-sm"></i>`)
+    heart_icon = gen('span')
+        .class('icon ml-2').sty('color: #D76C82;').inner(`<i class="fa-solid fa-heart"></i>`)
     likes = gen('span').sty('font-size: 13px;')
 
     source = 'source-youtube'
@@ -280,7 +282,7 @@ class Comment {
 
         //top
         if (arg.verified) this.badges.appendChild(this.verified_icon)
-        if (arg.isPinned) this.badges.appendChild(this.pinned_icon)
+        if (arg.isPinned || arg.pinned) this.badges.appendChild(this.pinned_icon)
         this.comment_header.appendChild(this.comment_author)
         this.comment_header.appendChild(this.badges)
 
@@ -288,6 +290,7 @@ class Comment {
         this.comment_footer.appendChild(this.replies)
         this.comment_footer.appendChild(this.like_icon)
         this.comment_footer.appendChild(this.likes)
+        if (arg.hearted || arg.creatorHeart) this.comment_footer.appendChild(this.heart_icon)
 
         // body
         this.right_stuff.appendChild(this.comment_header)
@@ -308,21 +311,19 @@ class Comment {
                 .replace(/&gt;/g, '>')
                 .replace(/&amp;/g, '&')
             this.source = 'source-reddit'
-        } else {
-            this.source = 'source-youtube'
         }
 
-        if (arg.authorThumbnails)
-            this.channel_logo_img.src = arg.authorThumbnails[0].url
+        if (arg.authorThumbnails || arg.thumbnail)
+            this.channel_logo_img.src = arg.authorThumbnails[0].url || arg.thumbnail
 
-        if (this.source === 'source-youtube') {
-            this.comment_author.innerHTML = arg.author
-            this.comment_content.innerHTML = arg.contentHtml
-            this.likes.innerHTML = numberFormat(arg.likeCount)
-        } else {
+        if (this.source === 'source-reddit') {
             this.comment_author.innerHTML = arg.data.author
             this.comment_content.innerHTML = decodedString
             this.likes.innerHTML = numberFormat(arg.data.score)
+        } else {
+            this.comment_author.innerHTML = arg.author.slice(1)
+            this.comment_content.innerHTML = arg.contentHtml || arg.commentText
+            this.likes.innerHTML = numberFormat(arg.likeCount)
         }
 
         //this.replies.innerHTML = `${arg.replies.replyCount} replies`
@@ -398,19 +399,22 @@ async function videoFetch(vid, api) {
 
     let currentIndex = 0, video_param
     while (currentIndex < api.length) {
-        const cur = api[currentIndex]
-        if (cur.includes("api"))
+        const cur = api[currentIndex].url
+        if (api[currentIndex].source === "pi")
             video_param = '/streams/'
-        else
+        else if (api[currentIndex].source === "in")
             video_param = '/api/v1/videos/'
         try {
             const beforeFetch = new Date().getTime()
-            const fetched = await fetch(cur + video_param + vid)
+            const fetched = await fetch(
+                cur + video_param + vid,
+                { signal: AbortSignal.timeout(9000) }
+            )
             const afterFetch = new Date().getTime()
             console.log(fetched)
 
             if (fetched.ok) {
-                pushEndPoint(cur)
+                pushEndPoint(api[currentIndex])
                 detectSpeed(beforeFetch, afterFetch)
                 fetchingProgressModalRemove()
                 return fetched.json()
@@ -441,22 +445,25 @@ async function dislikeFetch(vid) {
     }
 }
 
-async function commentsFetch(
-    vid,
-    api,
-    source = 'youtube',
-    sort_by = 'top',
-    cont,
-) {
+async function commentsFetch(vid, api, source = 'youtube', sort_by = 'top', cont) {
     spinnerToggle(document.querySelector('#comments'))
-    let i = 0
-    while (i < vid.length) {
-        try {
-            const url = new URL(`${api[i]}/api/v1/comments/${vid}`)
+    let currentIndex = 0
+    while (currentIndex < api.length) {
+        const cur = api[currentIndex].url
+        let url
+        if (api[currentIndex].source === "pi") {
+            url = `${cur}/comments/${vid}`
+            CommentHelper(vid, api, api[currentIndex].source)
+        }
+        else if (api[currentIndex].source === "in") {
+            url = new URL(`${cur}/api/v1/comments/${vid}`)
             url.searchParams.append('source', source)
             url.searchParams.append('sort_by', sort_by)
             if (cont) url.searchParams.append('source', cont)
-
+            CommentHelper(vid, api, api[currentIndex].source)
+        }
+        try {
+            console.log(url)
             const fetched = await fetch(url)
             if (fetched.ok) {
                 spinnerToggle(document.querySelector('#comments'))
@@ -466,18 +473,31 @@ async function commentsFetch(
                 return false
             }
         } catch (e) {
-            i++
+            currentIndex++
         }
     }
     return
 }
 
 let isAtBottom = false
-function CommentHelper(api, vid) {
+function CommentHelper(vid, api, sauce) {
     const commentYTButton = document.querySelector('#youtube-comment')
     const commentRedditButton = document.querySelector('#reddit-comment')
     const topButton = document.querySelector('#top-comment')
     const newButton = document.querySelector('#new-comment')
+
+    if (sauce === "in") {
+        [commentYTButton, commentRedditButton, topButton, newButton].forEach(e => {
+            e.classList.remove('is-loading')
+        })
+    }
+    else if (sauce === "pi") {
+        [commentYTButton, commentRedditButton, topButton, newButton].forEach(e => {
+            e.classList.remove('is-loading')
+            e.disabled = true
+        })
+    }
+
     const source_reddit = document.querySelector('#source-reddit')
     const source_youtube = document.querySelector('#source-youtube')
 
@@ -512,7 +532,7 @@ function CommentHelper(api, vid) {
             } else {
                 avail = false
                 notification(
-                    `Sorry, 😢<br>No reddit thread found for this video`,
+                    `No reddit thread found for this video`,
                     'is-warning is-size-6',
                     4000,
                 )
@@ -576,12 +596,11 @@ export async function watch(v_id, api) {
     }
 
     const video_res = await videoFetch(v_id, api)
-    //const dislike_res = await dislikeFetch(vid)
-    //const comment_res = await commentsFetch(vid, api)
+    const comment_res = await commentsFetch(v_id, api)
 
     if (!ifDep()) {
-        console.log(video_res)
-        //console.log(fetchingSpeed)
+        //console.log(video_res)
+        console.log(comment_res)
     }
 
     if (video_res) {
@@ -602,7 +621,6 @@ export async function watch(v_id, api) {
             console.error("Error Bottom Layout Generation: ", err)
             ret()
         }
-        //CommentSectionGen(comment_res)
-        //CommentHelper(api, vid);
+        CommentSectionGen(comment_res)
     }
 }
