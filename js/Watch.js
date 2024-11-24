@@ -9,6 +9,7 @@ import {
 } from './helper.js'
 import { LoadApi, pushEndPoint } from './Instances.js'
 
+let isAtBottom = false
 export const video = videojs('video-player', {
     controlBar: {
         children: [
@@ -314,7 +315,7 @@ class Comment {
         }
 
         if (arg.authorThumbnails || arg.thumbnail)
-            this.channel_logo_img.src = arg.authorThumbnails[0].url || arg.thumbnail
+            this.channel_logo_img.src = arg.thumbnail || arg.authorThumbnails[0].url
 
         if (this.source === 'source-reddit') {
             this.comment_author.innerHTML = arg.data.author
@@ -338,11 +339,25 @@ class Comment {
         parent.appendChild(this.comment_box)
     }
 }
-function CommentSectionGen(data) {
+function CommentSectionGen(data, vid, api) {
     data.comments.forEach((e) => {
         const comment = new Comment(e)
         //comment.addToParent(document.querySelector("#comments"))
     })
+    const nextpage = data.continuation || data.nextpage
+    if (nextpage) {
+        window.addEventListener('scroll', async () => {
+            const scrollPosition = window.innerHeight + window.scrollY
+            const bodyHeight = document.body.offsetHeight
+
+            if (scrollPosition >= bodyHeight - 5 && !isAtBottom) {
+                isAtBottom = true
+                CommentSectionGen(await commentsFetch({ vid: vid, api: api, nextpage: nextpage }), vid, api)
+            } else if (scrollPosition < bodyHeight - 5) {
+                isAtBottom = false
+            }
+        })
+    }
 }
 
 let fetchingSpeed = 0
@@ -411,7 +426,6 @@ async function videoFetch(vid, api) {
                 { signal: AbortSignal.timeout(9000) }
             )
             const afterFetch = new Date().getTime()
-            console.log(fetched)
 
             if (fetched.ok) {
                 pushEndPoint(api[currentIndex])
@@ -423,7 +437,7 @@ async function videoFetch(vid, api) {
                 fetchingProgressModal(currentIndex, api.length)
             }
         } catch (err) {
-            console.log(err)
+            console.error("Error outside the [endpoints-arr]")
             currentIndex++
             fetchingProgressModal(currentIndex, api.length)
         }
@@ -445,25 +459,28 @@ async function dislikeFetch(vid) {
     }
 }
 
-async function commentsFetch(vid, api, source = 'youtube', sort_by = 'top', cont) {
+async function commentsFetch({ vid, api, source = 'youtube', sort_by = 'top', nextpage }) {
     spinnerToggle(document.querySelector('#comments'))
     let currentIndex = 0
     while (currentIndex < api.length) {
         const cur = api[currentIndex].url
         let url
         if (api[currentIndex].source === "pi") {
-            url = `${cur}/comments/${vid}`
+            if (nextpage)
+                url = `${cur}/nextpage/comments/${vid}?nextpage=${encodeURIComponent(nextpage)}`
+            else
+                url = `${cur}/comments/${vid}`
             CommentHelper(vid, api, api[currentIndex].source)
         }
         else if (api[currentIndex].source === "in") {
             url = new URL(`${cur}/api/v1/comments/${vid}`)
+            if (nextpage) url.searchParams.append('continuation', nextpage)
             url.searchParams.append('source', source)
             url.searchParams.append('sort_by', sort_by)
-            if (cont) url.searchParams.append('source', cont)
             CommentHelper(vid, api, api[currentIndex].source)
         }
+        console.log(url)
         try {
-            console.log(url)
             const fetched = await fetch(url)
             if (fetched.ok) {
                 spinnerToggle(document.querySelector('#comments'))
@@ -479,7 +496,6 @@ async function commentsFetch(vid, api, source = 'youtube', sort_by = 'top', cont
     return
 }
 
-let isAtBottom = false
 function CommentHelper(vid, api, sauce) {
     const commentYTButton = document.querySelector('#youtube-comment')
     const commentRedditButton = document.querySelector('#reddit-comment')
@@ -522,7 +538,7 @@ function CommentHelper(vid, api, sauce) {
     commentRedditButton.addEventListener('click', async () => {
         let avail = true
         if (source_reddit.childNodes.length <= 1) {
-            const comment_data = await commentsFetch(vid, api, 'reddit')
+            const comment_data = await commentsFetch({ vid: vid, api: api, source: 'reddit' })
             if (comment_data) {
                 source = 'reddit'
                 source_youtube.classList.add('is-hidden')
@@ -553,11 +569,11 @@ function CommentHelper(vid, api, sauce) {
         toggleInvert(topButton, newButton)
         if (source === 'youtube') {
             source_youtube.innerHTML = ''
-            const comment_data = await commentsFetch(vid, api, source, 'top')
+            const comment_data = await commentsFetch({ vid: vid, api: api, source: source, sort_by: 'top' })
             CommentSectionGen(comment_data)
         } else {
             source_reddit.innerHTML = ''
-            const comment_data = await commentsFetch(vid, api, source, 'top')
+            const comment_data = await commentsFetch({ vid: vid, api: api, source: source, sort_by: 'top' })
             CommentSectionGen(comment_data)
         }
     })
@@ -565,23 +581,12 @@ function CommentHelper(vid, api, sauce) {
         toggleInvert(newButton, topButton)
         if (source === 'youtube') {
             source_youtube.innerHTML = ''
-            const comment_data = await commentsFetch(vid, api, source, 'new')
+            const comment_data = await commentsFetch({ vid: vid, api: api, source: source, sort_by: 'new' })
             CommentSectionGen(comment_data)
         } else {
             source_reddit.innerHTML = ''
-            const comment_data = await commentsFetch(vid, api, source, 'new')
+            const comment_data = await commentsFetch({ vid: vid, api: api, source: source, sort_by: 'new' })
             CommentSectionGen(comment_data)
-        }
-    })
-
-    window.addEventListener('scroll', function() {
-        const scrollPosition = window.innerHeight + window.scrollY
-        const bodyHeight = document.body.offsetHeight
-
-        if (scrollPosition >= bodyHeight - 5 && !isAtBottom) {
-            isAtBottom = true
-        } else if (scrollPosition < bodyHeight - 5) {
-            isAtBottom = false
         }
     })
 }
@@ -596,13 +601,6 @@ export async function watch(v_id, api) {
     }
 
     const video_res = await videoFetch(v_id, api)
-    const comment_res = await commentsFetch(v_id, api)
-
-    if (!ifDep()) {
-        //console.log(video_res)
-        console.log(comment_res)
-    }
-
     if (video_res) {
         document.title = video_res.title
         //try {
@@ -621,6 +619,10 @@ export async function watch(v_id, api) {
             console.error("Error Bottom Layout Generation: ", err)
             ret()
         }
-        CommentSectionGen(comment_res)
+    }
+
+    const comment_res = await commentsFetch({ vid: v_id, api: api })
+    if (comment_res) {
+        CommentSectionGen(comment_res, v_id, api)
     }
 }

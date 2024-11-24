@@ -272,6 +272,7 @@ export async function SearchLoad(query, nextPageUrl, filter) {
             const scrollPosition = window.innerHeight + window.scrollY;
             const bodyHeight = document.body.offsetHeight;
 
+            console.log(window.innerHeight, window.scrollY, document.body.offsetHeight)
             if (scrollPosition >= bodyHeight - 5 && !isAtBottom) {
                 isAtBottom = true;
                 SearchLoad(query, NextPageUrl);
