@@ -603,13 +603,13 @@ export async function watch(v_id, api) {
     const video_res = await videoFetch(v_id, api)
     if (video_res) {
         document.title = video_res.title
-        //try {
-        //    PlayVideo(video_res, def_quality)
-        //    ret()
-        //} catch (err) {
-        //    console.error('Error Playing Video: ', err)
-        //    ret()
-        //}
+        try {
+            PlayVideo(video_res, def_quality)
+            ret()
+        } catch (err) {
+            console.error('Error Playing Video: ', err)
+            ret()
+        }
 
         try {
             BottomLayoutGen(video_res, v_id)
