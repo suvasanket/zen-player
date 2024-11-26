@@ -3,6 +3,53 @@ html, body {
   margin: 0;
   padding: 0;
 }
+.notification {
+  z-index: 1500;
+}
+
+#source_name {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  font-size: 11px;
+  font-weight: bold;
+  background-color: rgba(48, 48, 48, 0.5);
+  color: rgba(189, 189, 189, 0.5);
+  padding: 3px;
+  border-radius: 5px;
+  z-index: 500;
+}
+
+#fetchingProgressModal {
+  align-items: flex-end !important; /* Push modal content vertically to the bottom */
+  justify-content: flex-start !important; /* Push modal content horizontally to the left */
+}
+
+#fetchingProgressModal .modal-content {
+  position: fixed;
+  bottom: 50px; /* Adjust to create spacing from bottom */
+  left: 50px;   /* Adjust to create spacing from left */
+  margin: 0;   /* Remove any margins */
+  width: auto; /* Prevent full-width modal effect */
+  max-width: 300px; /* Optional: Limit the width */
+  z-index: 700; /* Ensure it remains above other elements */
+}
+
+#centerButtons {
+  position: fixed; /* Ensure it stays in the viewport */
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Adjust to perfectly center */
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  align-items: center; /* Ensure buttons are aligned */
+  gap: 10px; /* Add spacing between the buttons */
+}
+.icon.is-large {
+  font-size: 40px;
+  color: #E0E0E0;
+  text-decoration: none;
+}
 
 .video-box {
   width: 100%;

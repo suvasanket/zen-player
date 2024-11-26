@@ -151,13 +151,21 @@
         <div class="modal-background"></div>
           <div class="modal-content">
             <!-- Progress Bar -->
-            <p class="title is-4">Finding Server</p>
-            <p class="subtitle is-6 mt-3">
+            <p class="title is-4">searching server</p>
+            <p class="subtitle is-6 mt-3" id="fetchingProgressModalsubtitle">
             The bar represent how many potential server available to fetch the video. So progress mean its not good.<br>
             </p>
             <progress class="progress is-danger is-small mt-3" max="100" id="fetchingProgressModalProgress"></progress>
           </div>
-          <!--<button class="button m-6">Update server list</button>-->
+      </div>
+
+      <div id="source_name" class="is-hidden">
+        <span class="icon-text">
+          <span class="icon">
+            <i class="fa-solid fa-play"></i>
+          </span>
+          <span id="source_name_span" class="mr-2"></span>
+        </span>
       </div>
 
       <script src="js/helper.js" type="module"></script>

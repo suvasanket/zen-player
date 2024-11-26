@@ -377,30 +377,46 @@ function detectSpeed(start, end) {
         sessionStorage.setItem('fetchingSpeed', String(inMbps))
     fetchingSpeed = inMbps
 }
-function fetchingProgressModal(value, max) {
+function fetchingProgressModal(currentIndex, api) {
+    const max = api.length
     const modal = document.getElementById("fetchingProgressModal")
+    const subtitle = document.getElementById("fetchingProgressModalsubtitle")
+    if (currentIndex < max)
+        subtitle.innerHTML = `fetching data from ${api[currentIndex].url}...`
+    else
+        subtitle.innerHTML = `It seems all available servers have been exhausted. Click the icon in the center to refresh the server list.`
     modal.classList.add("is-active")
     const progress = document.getElementById("fetchingProgressModalProgress")
-    progress.value = String(value)
+    progress.value = String(currentIndex)
     progress.max = String(max)
 }
 const fetchingProgressModalRemove = () => { document.getElementById("fetchingProgressModal").classList.remove('is-active') }
-function updateEndpointList(vid) {
+
+function showSourceName(name) {
+    const sauce_name = document.querySelector("#source_name")
+    sauce_name.classList.remove("is-hidden")
+    console.log(name)
+    name = name === "pi" ? "piped" : "invidious"
+    document.querySelector("#source_name_span").innerHTML = name
+}
+function allEndpointsExhausted(vid) {
     const modal = document.getElementById("fetchingProgressModal")
-    const button = gen('button')
-        .class('button is-success is-light m-6')
-        .inner('update server-list')
+    const centerButtons = gen("div")
+    centerButtons.id = "centerButtons"
+    const reloadIcon = gen("span").class("icon is-large")
+        .inner(`<i class="fa-solid fa-rotate-right"></i>`)
+    const resetServer = gen('a')
     const youtube = gen('a')
-        .class('button is-danger is-dark m-6')
+        .class('button is-rounded m-6')
         .inner('open in youtube')
     youtube.href = `${yt_domain}/watch?v=${vid}`
-    const buttons = gen('div').class('buttons')
-    buttons.appendChild(button)
-    buttons.appendChild(youtube)
-    modal.appendChild(buttons)
-    button.addEventListener('click', () => {
+    resetServer.appendChild(reloadIcon)
+    centerButtons.appendChild(resetServer)
+    centerButtons.appendChild(youtube)
+    modal.appendChild(centerButtons)
+    resetServer.addEventListener('click', () => {
         fetchingProgressModalRemove()
-        button.remove()
+        resetServer.remove()
         LoadApi()
         location.reload()
     })
@@ -435,19 +451,20 @@ async function videoFetch(vid, api) {
                 pushEndPoint(api[currentIndex])
                 detectSpeed(beforeFetch, afterFetch)
                 fetchingProgressModalRemove()
+                showSourceName(api[currentIndex].source)
                 return fetched.json()
             } else {
                 currentIndex++
-                fetchingProgressModal(currentIndex, api.length)
+                fetchingProgressModal(currentIndex, api)
             }
         } catch (err) {
             console.error("Error outside the [endpoints-arr]")
             currentIndex++
-            fetchingProgressModal(currentIndex, api.length)
+            fetchingProgressModal(currentIndex, api)
         }
     }
 
-    updateEndpointList(vid)
+    allEndpointsExhausted(vid)
     return
 }
 
@@ -459,7 +476,7 @@ async function dislikeFetch(vid) {
         return fetched_dislike.json()
     }
     catch (err) {
-        notification(`Error getting dislikes`, `is-warning`, 1000)
+        notification(`Error getting dislikes`, `is-warning`, 3000)
     }
 }
 
