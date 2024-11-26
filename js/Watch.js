@@ -149,36 +149,39 @@ function PlayVideo(video_res, default_quality) {
     const videoSrc = qualityExtract(player_vid, default_quality)
     video.src(videoSrc)
 
-    // video-audio sync
-    function syncAudioVideo() {
-        if (Math.abs(audio.currentTime - video.currentTime) > 0.1) {
-            if (audio.currentTime < video.currentTime) {
-                audio.currentTime = video.currentTime
-            } else {
-                video.currentTime = audio.currentTime
+    try {
+        // video-audio sync
+        function syncAudioVideo() {
+            if (Math.abs(audio.currentTime - video.currentTime()) > 0.1) {
+                if (audio.currentTime < video.currentTime()) {
+                    audio.currentTime = video.currentTime()
+                } else {
+                    video.currentTime(audio.currentTime)
+                }
             }
         }
-        requestAnimationFrame(syncAudioVideo)
-    }
+        const syncVid = () => audio.currentTime = video.currentTime()
+        const Playy = () => {
+            syncVid()
+            audio.play()
+            video.play()
+        }
 
-    video.on('play', () => audio.play())
-    video.on('pause', () => audio.pause())
-    video.on('progress', () => syncAudioVideo())
-    video.on('seeking', () => (audio.currentTime = video.currentTime()))
-    video.on('loadstart', () => audio.pause())
-    video.on('waiting', () => audio.pause())
-    video.on('timeupdate', syncAudioVideo)
-    video.on('volumechange', () => (audio.volume = video.volume()))
-    video.on('playing', () => {
-        audio.play()
-        syncAudioVideo()
-    })
-    video.on('qualitySelected', () => (audio.currentTime = video.currentTime()))
-    video.on('canplay', () => {
-        video.play()
-        audio.play()
-        syncAudioVideo()
-    })
+        video.on('play', () => audio.play())
+        video.on('pause', () => audio.pause())
+        video.on('progress', () => syncAudioVideo())
+        video.on('playing', () => syncAudioVideo())
+        video.on('seeking', () => syncAudioVideo())
+        //video.on('timeupdate', syncAudioVideo)
+        video.on('qualitySelected', () => syncVid())
+        video.on('loadstart', () => audio.pause())
+        video.on('waiting', () => audio.pause())
+        video.on('volumechange', () => (audio.volume = video.volume()))
+        video.on('canplay', () => Playy())
+        //video.on('loadeddata', () => Playy())
+    } catch (err) {
+        notification(`Error while playing, your browser might have blocking event`, `is-danger`, 8000)
+    }
 }
 
 const removeSkele = (element) => element.classList.remove('has-skeleton')
@@ -427,6 +430,7 @@ async function videoFetch(vid, api) {
             )
             const afterFetch = new Date().getTime()
 
+            console.log(fetched)
             if (fetched.ok) {
                 pushEndPoint(api[currentIndex])
                 detectSpeed(beforeFetch, afterFetch)
@@ -479,7 +483,7 @@ async function commentsFetch({ vid, api, source = 'youtube', sort_by = 'top', ne
             url.searchParams.append('sort_by', sort_by)
             CommentHelper(vid, api, api[currentIndex].source)
         }
-        console.log(url)
+        //console.log(url)
         try {
             const fetched = await fetch(url)
             if (fetched.ok) {

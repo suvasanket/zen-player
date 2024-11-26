@@ -72,7 +72,8 @@ export function notification_detector_loader() {
         const $notification = $delete.parentNode;
 
         $delete.addEventListener('click', () => {
-            $notification.parentNode.removeChild($notification);
+            if ($notification.parentNode)
+                $notification.parentNode.removeChild($notification);
             if (!document.querySelector(".notification"))
                 document.querySelector('#notification-center').remove()
         });

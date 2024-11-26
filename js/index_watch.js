@@ -16,5 +16,5 @@ document.addEventListener('DOMContentLoaded', () => {
         const api = GetApi()
         watch(id, api)
     })
-    unhandeledRejection()
+    //unhandeledRejection()
 })
