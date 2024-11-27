@@ -412,7 +412,7 @@ function showSourceName(cur) {
     name = name === "pi" ? "piped" : "invidious"
     name_span.innerHTML = name
     name_span.href = cur.url
-    document.querySelector("#source_name_icon").addEventListener("click", () =>{
+    document.querySelector("#source_name_icon").addEventListener("click", () => {
         document.body.scrollTop = 0 // safari
         document.documentElement.scrollTop = 0 // rest
     })
@@ -439,6 +439,25 @@ function allEndpointsExhausted(vid) {
         location.reload()
     })
 }
+function getTimeout(lastUsed) {
+    let timeOut = 5000
+    const speed = sessionStorage.getItem('fetchingSpeed') || sessionStorage.getItem('firstFetchingSpeed')
+    if (speed) {
+        console.log(speed)
+        if (speed < 0.1) {
+            notification(`slow internet speed`, `is-danger is-light`, 3000)
+            timeOut = 50000
+            if (lastUsed)
+                timeOut += 10000
+        }
+        if (0.1 < speed <= 0.5) {
+            timeOut = 10000
+            if (lastUsed)
+                timeOut += 10000
+        }
+        return timeOut
+    }
+}
 
 async function videoFetch(vid, api) {
     video.addClass('vjs-waiting')
@@ -449,33 +468,34 @@ async function videoFetch(vid, api) {
             4000,
         )
 
-    let currentIndex = 0, video_param
+    let currentIndex = 0, video_param, TimeOut
     while (currentIndex < api.length) {
         const cur = api[currentIndex].url
         if (api[currentIndex].source === "pi")
             video_param = '/streams/'
         else if (api[currentIndex].source === "in")
             video_param = '/api/v1/videos/'
-        try {
-            const beforeFetch = new Date().getTime()
-            const fetched = await fetch(
-                cur + video_param + vid,
-                { signal: AbortSignal.timeout(9000) }
-            )
-            const afterFetch = new Date().getTime()
 
-            if (fetched.ok) {
-                pushEndPoint(api[currentIndex])
-                detectSpeed(beforeFetch, afterFetch)
-                fetchingProgressModalRemove()
-                showSourceName(api[currentIndex])
-                return fetched.json()
-            } else {
-                currentIndex++
-                fetchingProgressModal(currentIndex, api)
-            }
-        } catch (err) {
-            console.error("Error outside the [endpoints-arr]")
+        if (api[currentIndex].lastUsed)
+            TimeOut = getTimeout(api[currentIndex].lastUsed < 86400000)
+        else
+            TimeOut = getTimeout()
+
+        const beforeFetch = new Date().getTime()
+        const fetched = await fetch(
+            cur + video_param + vid,
+            { signal: AbortSignal.timeout(TimeOut) }
+        )
+        const afterFetch = new Date().getTime()
+
+        if (fetched.ok) {
+            api[currentIndex].lastUsed = Date.now()
+            pushEndPoint(api[currentIndex])
+            detectSpeed(beforeFetch, afterFetch)
+            fetchingProgressModalRemove()
+            showSourceName(api[currentIndex])
+            return fetched.json()
+        } else {
             currentIndex++
             fetchingProgressModal(currentIndex, api)
         }

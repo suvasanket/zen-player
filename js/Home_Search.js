@@ -187,20 +187,19 @@ document.addEventListener("SearchSubmit", e => {
 })
 
 function detectSpeed(start, end, numofvid) {
-    //15.97 hardcoded size
-
+    //16 is per item datasize
     const durationSec = (end - start) / 1000
-    const loadedBits = 127.76 * numofvid
+    const loadedBits = 128 * numofvid
     const inBps = (loadedBits / durationSec).toFixed(2)
     const inKbps = (inBps / 1024).toFixed(2)
     const inMbps = (inKbps / 1024).toFixed(2)
 
-    //const storedSpeed = sessionStorage.getItem('thumbnailFetchingSpeed');
-    //if (storedSpeed === null)
-    //    sessionStorage.setItem('thumbnailFetchingSpeed', String(inMbps))
-    //
-    //if (storedSpeed !== null)
-    //    return storedSpeed
+    const storedSpeed = sessionStorage.getItem('firstFetchingSpeed');
+    if (storedSpeed === null)
+        sessionStorage.setItem('firstFetchingSpeed', String(inMbps))
+
+    if (storedSpeed !== null)
+        return storedSpeed
     return inMbps
 }
 
@@ -222,7 +221,6 @@ async function piped_fetch(query, nextPageUrl, filter = "videos") {
 
             if (nextPageUrl)
                 url = `${endpoint}/nextpage/search?q=${query}&filter=videos&nextpage=${encodeURIComponent(nextPageUrl)}`;
-
             const beforeFetch = new Date().getTime()
             const response = await fetch(url, { signal: AbortSignal.timeout(4000) });
             const afterFetch = new Date().getTime()
