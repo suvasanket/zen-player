@@ -19,6 +19,9 @@ html, body {
   border-radius: 5px;
   z-index: 500;
 }
+#source_name_icon, #source_name_span {
+  color: rgba(189, 189, 189, 0.5);
+}
 
 #fetchingProgressModal {
   align-items: flex-end !important; /* Push modal content vertically to the bottom */
@@ -30,8 +33,7 @@ html, body {
   bottom: 50px; /* Adjust to create spacing from bottom */
   left: 50px;   /* Adjust to create spacing from left */
   margin: 0;   /* Remove any margins */
-  width: auto; /* Prevent full-width modal effect */
-  max-width: 300px; /* Optional: Limit the width */
+  width: 500px; /* Prevent full-width modal effect */
   z-index: 700; /* Ensure it remains above other elements */
 }
 

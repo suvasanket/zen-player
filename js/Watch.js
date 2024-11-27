@@ -142,7 +142,6 @@ function getDefaultQuality(def, arr) {
 }
 
 function PlayVideo(video_res, default_quality) {
-    video.removeClass('vjs-waiting')
     const { player_aud, player_vid } = video_audioSplit(video_res)
 
     let audio = new Audio(player_aud[0].url)
@@ -177,7 +176,10 @@ function PlayVideo(video_res, default_quality) {
         video.on('loadstart', () => audio.pause())
         video.on('waiting', () => audio.pause())
         video.on('volumechange', () => (audio.volume = video.volume()))
-        video.on('canplay', () => Playy())
+        video.on('canplay', () => {
+            video.removeClass('vjs-waiting')
+            Playy()
+        })
         //video.on('loadeddata', () => Playy())
     } catch (err) {
         notification(`Error while playing, your browser might have blocking event`, `is-danger`, 8000)
@@ -392,12 +394,18 @@ function fetchingProgressModal(currentIndex, api) {
 }
 const fetchingProgressModalRemove = () => { document.getElementById("fetchingProgressModal").classList.remove('is-active') }
 
-function showSourceName(name) {
+function showSourceName(cur) {
+    let name = cur.source
     const sauce_name = document.querySelector("#source_name")
+    const name_span = document.querySelector("#source_name_span")
     sauce_name.classList.remove("is-hidden")
-    console.log(name)
     name = name === "pi" ? "piped" : "invidious"
-    document.querySelector("#source_name_span").innerHTML = name
+    name_span.innerHTML = name
+    name_span.href = cur.url
+    document.querySelector("#source_name_icon").addEventListener("click", () =>{
+        document.body.scrollTop = 0 // safari
+        document.documentElement.scrollTop = 0 // rest
+    })
 }
 function allEndpointsExhausted(vid) {
     const modal = document.getElementById("fetchingProgressModal")
@@ -446,12 +454,11 @@ async function videoFetch(vid, api) {
             )
             const afterFetch = new Date().getTime()
 
-            console.log(fetched)
             if (fetched.ok) {
                 pushEndPoint(api[currentIndex])
                 detectSpeed(beforeFetch, afterFetch)
                 fetchingProgressModalRemove()
-                showSourceName(api[currentIndex].source)
+                showSourceName(api[currentIndex])
                 return fetched.json()
             } else {
                 currentIndex++
@@ -646,4 +653,4 @@ export async function watch(v_id, api) {
     if (comment_res) {
         CommentSectionGen(comment_res, v_id, api)
     }
-}
+    }
