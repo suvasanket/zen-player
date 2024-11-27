@@ -6,6 +6,7 @@ import {
     gen,
     spinnerToggle,
     getRelativeTime,
+    genIcon,
 } from './helper.js'
 import { LoadApi, pushEndPoint } from './Instances.js'
 
@@ -383,10 +384,19 @@ function fetchingProgressModal(currentIndex, api) {
     const max = api.length
     const modal = document.getElementById("fetchingProgressModal")
     const subtitle = document.getElementById("fetchingProgressModalsubtitle")
-    if (currentIndex < max)
-        subtitle.innerHTML = `fetching data from ${api[currentIndex].url}...`
-    else
-        subtitle.innerHTML = `It seems all available servers have been exhausted. Click the icon in the center to refresh the server list.`
+    if (currentIndex < max) {
+        document.getElementById("fetchingProgressfetching").innerHTML = `connecting to ${api[currentIndex].url}...`
+        document.getElementById("fetchingProgressfailed").innerHTML = `error fetching from ${api[currentIndex - 1].url}`
+    }
+    else {
+        const NoServer = genIcon({
+            icon: `<i class="fa-solid fa-face-sad-cry"></i>`,
+            text: `It seems all available servers have been exhausted. Click the icon in the center to refresh the server list.`,
+            iconclass: `has-text-warning`
+        })
+        subtitle.innerHTML = ''
+        subtitle.appendChild(NoServer)
+    }
     modal.classList.add("is-active")
     const progress = document.getElementById("fetchingProgressModalProgress")
     progress.value = String(currentIndex)
@@ -653,4 +663,4 @@ export async function watch(v_id, api) {
     if (comment_res) {
         CommentSectionGen(comment_res, v_id, api)
     }
-    }
+}

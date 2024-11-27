@@ -152,8 +152,20 @@
           <div class="modal-content">
             <!-- Progress Bar -->
             <p class="title is-4">searching server</p>
-            <p class="subtitle is-6 mt-3" id="fetchingProgressModalsubtitle">
-            The bar represent how many potential server available to fetch the video. So progress mean its not good.<br>
+            <p class="subtitle is-6 mt-3 is-family-monospace " id="fetchingProgressModalsubtitle">
+            <span class="icon-text" style="display: inline;">
+              <span class="icon has-text-success is-small">
+                <i class="fa-solid fa-wrench"></i>
+              </span>
+              <span id="fetchingProgressfetching" class="has-text-weight-bold"></span>
+            </span>
+            <br>
+            <span class="icon-text" style="display: inline;">
+              <span class="icon has-text-danger is-small">
+                <i class="fa-solid fa-xmark"></i>
+              </span>
+              <span id="fetchingProgressfailed"></span>
+            </span>
             </p>
             <progress class="progress is-danger is-small mt-3" max="100" id="fetchingProgressModalProgress"></progress>
           </div>

@@ -29,6 +29,7 @@ async function Cobalt(vurl, audio, quality, codec, filestyle, dub, metadata) {
 
         })
         const data = await fetched.json()
+        console.log(data)
 
         if (data)
             return data

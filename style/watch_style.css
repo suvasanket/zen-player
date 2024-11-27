@@ -6,6 +6,11 @@ html, body {
 .notification {
   z-index: 1500;
 }
+.icon.is-small {
+  font-size: 10px;
+  padding-top: 10px;
+  transform: translate(-3px, 0%);
+}
 
 #source_name {
   position: fixed;
@@ -33,7 +38,7 @@ html, body {
   bottom: 50px; /* Adjust to create spacing from bottom */
   left: 50px;   /* Adjust to create spacing from left */
   margin: 0;   /* Remove any margins */
-  width: 500px; /* Prevent full-width modal effect */
+  width: 600px; /* Prevent full-width modal effect */
   z-index: 700; /* Ensure it remains above other elements */
 }
 

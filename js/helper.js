@@ -103,10 +103,29 @@ export function gen(tag) {
         return this
     }
     element.inner = function(val) {
-        this.innerHTML = val
+        if (typeof val === "string")
+            this.innerHTML = val
+        else
+            this.appendChild(val)
         return this
     }
     return element
+}
+export function genIcon({ icon, text, iconclass, textclass }) {
+    const icony = gen("span").class("icon").inner(icon)
+    if (iconclass)
+        icony.classList.add(iconclass)
+    if (text) {
+        const iconText = gen("span").class("icon-text")
+        const texty = gen("span").inner(text)
+        if (textclass)
+            texty.classList.add(textclass)
+        iconText.appendChild(icony)
+        iconText.appendChild(texty)
+        return iconText
+    }
+    else
+        return icony
 }
 
 export function notification(content, Class, duration) {
